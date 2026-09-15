@@ -1,0 +1,16 @@
+{
+  "name": "speckit-radzen",
+  "version": "1.1.0",
+  "distribution": "portable",
+  "coreVersion": "1.0.0",
+  "integrations": [
+    "claude",
+    "codex",
+    "copilot",
+    "generic-agent-skills"
+  ],
+  "repositoryAware": true,
+  "architecturePreserving": true,
+  "radzenMcpFirst": true,
+  "credentialsEmbedded": false
+}

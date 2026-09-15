@@ -1,0 +1,12 @@
+# Responsive & Accessibility Checklist
+- [ ] Desktop behavior reviewed
+- [ ] Tablet/constrained width reviewed
+- [ ] Mobile behavior reviewed
+- [ ] Overflow intentional
+- [ ] Keyboard interaction usable
+- [ ] Focus behavior usable
+- [ ] Inputs/actions have meaningful labels/names
+- [ ] Validation understandable
+- [ ] Dialogs usable at constrained widths
+- [ ] Grid/list behavior intentionally responsive
+- [ ] Color is not sole information carrier
