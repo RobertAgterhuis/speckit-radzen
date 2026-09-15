@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "feature": "001-customer-search",
+  "entries": [
+    {
+      "id": "MCP-001",
+      "at": "2026-09-15T12:10:00Z",
+      "component": "RadzenDataGrid",
+      "members": [
+        "LoadData",
+        "Count",
+        "IsLoading",
+        "AllowPaging",
+        "PageSize",
+        "EmptyText",
+        "FirstPage"
+      ],
+      "question": "How does RadzenDataGrid page on the server and report the total count?",
+      "query": "RadzenDataGrid LoadData server-side paging with Count, IsLoading and EmptyText for TItem CustomerSummary (Id, Name, City)",
+      "source": "mcp",
+      "rank": 3,
+      "server": "radzen-blazor",
+      "tool": "search",
+      "summary": "LoadData(LoadDataArgs) is raised for paging/sorting/filtering; bind Data to the current page and Count to the total; IsLoading shows the loading indicator; EmptyText sets the no-data message; FirstPage(forceReload) returns to page 1 and reloads.",
+      "radzenVersion": "7.x",
+      "projectEvidence": [],
+      "compileVerified": true,
+      "fallbackApproved": false,
+      "fallbackReason": null,
+      "status": "confirmed",
+      "supersedes": null
+    },
+    {
+      "id": "MCP-002",
+      "at": "2026-09-15T12:12:00Z",
+      "component": "RadzenTextBox",
+      "members": [
+        "Change",
+        "Value"
+      ],
+      "question": "Which RadzenTextBox event fires once when the value is committed?",
+      "query": "RadzenTextBox Change event vs @oninput, with @bind-Value, inside RadzenFormField",
+      "source": "mcp",
+      "rank": 3,
+      "server": "radzen-blazor",
+      "tool": "search",
+      "summary": "Change (EventCallback<string>) fires when the value is committed (blur/Enter); @bind-Value keeps the value in sync; RadzenFormField Text renders the visible label.",
+      "radzenVersion": "7.x",
+      "projectEvidence": [],
+      "compileVerified": true,
+      "fallbackApproved": false,
+      "fallbackReason": null,
+      "status": "confirmed",
+      "supersedes": null
+    },
+    {
+      "id": "MCP-003",
+      "at": "2026-09-15T12:13:00Z",
+      "component": "LoadDataArgs",
+      "members": [
+        "Skip",
+        "Top"
+      ],
+      "question": "Which LoadDataArgs members carry the requested page?",
+      "query": "Radzen LoadDataArgs Skip Top nullable paging values",
+      "source": "mcp",
+      "rank": 3,
+      "server": "radzen-blazor",
+      "tool": "search",
+      "summary": "Skip and Top are nullable ints with the requested offset and page size.",
+      "radzenVersion": "7.x",
+      "projectEvidence": [],
+      "compileVerified": true,
+      "fallbackApproved": false,
+      "fallbackReason": null,
+      "status": "confirmed",
+      "supersedes": null
+    }
+  ]
+}

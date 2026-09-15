@@ -1,0 +1,831 @@
+{
+  "schemaVersion": 1,
+  "rules": [
+    {
+      "id": "arch.mediator.mediatr",
+      "fact": "architecture.mediator",
+      "value": "MediatR",
+      "kind": "package",
+      "pattern": "^MediatR$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.mediator.mediator",
+      "fact": "architecture.mediator",
+      "value": "Mediator (source generator)",
+      "kind": "package",
+      "pattern": "^Mediator\\.(Abstractions|SourceGenerator)$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.mediator.wolverine",
+      "fact": "architecture.mediator",
+      "value": "Wolverine",
+      "kind": "package",
+      "pattern": "^WolverineFx$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.mediator.brighter",
+      "fact": "architecture.mediator",
+      "value": "Brighter",
+      "kind": "package",
+      "pattern": "^Paramore\\.Brighter",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.validation.fluent",
+      "fact": "architecture.validation",
+      "value": "FluentValidation",
+      "kind": "package",
+      "pattern": "^FluentValidation",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.validation.annotations",
+      "fact": "architecture.validation",
+      "value": "DataAnnotations",
+      "kind": "content",
+      "pattern": "using System\\.ComponentModel\\.DataAnnotations|\\[Required[\\]\\(]",
+      "confidence": "inferred",
+      "multi": true,
+      "files": [
+        "*.cs"
+      ]
+    },
+    {
+      "id": "arch.validation.validatableobject",
+      "fact": "architecture.validation",
+      "value": "IValidatableObject",
+      "kind": "content",
+      "pattern": "\\bIValidatableObject\\b",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.cs"
+      ]
+    },
+    {
+      "id": "arch.mapping.automapper",
+      "fact": "architecture.mapping",
+      "value": "AutoMapper",
+      "kind": "package",
+      "pattern": "^AutoMapper",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.mapping.mapster",
+      "fact": "architecture.mapping",
+      "value": "Mapster",
+      "kind": "package",
+      "pattern": "^Mapster",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.mapping.mapperly",
+      "fact": "architecture.mapping",
+      "value": "Mapperly",
+      "kind": "package",
+      "pattern": "^Riok\\.Mapperly$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.persistence.efcore",
+      "fact": "architecture.persistence",
+      "value": "EF Core",
+      "kind": "package",
+      "pattern": "^Microsoft\\.EntityFrameworkCore(\\.SqlServer|\\.Sqlite|\\.Cosmos|\\.InMemory|\\.Relational)?$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.persistence.npgsql",
+      "fact": "architecture.persistence",
+      "value": "EF Core (PostgreSQL)",
+      "kind": "package",
+      "pattern": "^Npgsql\\.EntityFrameworkCore\\.PostgreSQL$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.persistence.dapper",
+      "fact": "architecture.persistence",
+      "value": "Dapper",
+      "kind": "package",
+      "pattern": "^Dapper$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.persistence.mongo",
+      "fact": "architecture.persistence",
+      "value": "MongoDB",
+      "kind": "package",
+      "pattern": "^MongoDB\\.Driver$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.persistence.marten",
+      "fact": "architecture.persistence",
+      "value": "Marten",
+      "kind": "package",
+      "pattern": "^Marten$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.persistence.tables",
+      "fact": "architecture.persistence",
+      "value": "Azure Tables / Cosmos SDK",
+      "kind": "package",
+      "pattern": "^(Azure\\.Data\\.Tables|Microsoft\\.Azure\\.Cosmos)$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.api.minimal",
+      "fact": "architecture.apiStyle",
+      "value": "Minimal APIs",
+      "kind": "content",
+      "pattern": "\\.Map(Get|Post|Put|Delete|Patch|Group)\\s*\\(",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.cs"
+      ]
+    },
+    {
+      "id": "arch.api.controllers",
+      "fact": "architecture.apiStyle",
+      "value": "Controllers",
+      "kind": "content",
+      "pattern": "\\[ApiController\\]|\\bAddControllers\\s*\\(",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.cs"
+      ]
+    },
+    {
+      "id": "arch.api.fastendpoints",
+      "fact": "architecture.apiStyle",
+      "value": "FastEndpoints",
+      "kind": "package",
+      "pattern": "^FastEndpoints$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.api.grpc",
+      "fact": "architecture.apiStyle",
+      "value": "gRPC",
+      "kind": "package",
+      "pattern": "^Grpc\\.(AspNetCore|Net\\.Client)$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.http.refit",
+      "fact": "architecture.httpClients",
+      "value": "Refit",
+      "kind": "package",
+      "pattern": "^Refit",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.http.typed",
+      "fact": "architecture.httpClients",
+      "value": "Typed HttpClient (AddHttpClient<T>)",
+      "kind": "content",
+      "pattern": "AddHttpClient\\s*<",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.cs"
+      ]
+    },
+    {
+      "id": "arch.http.inject",
+      "fact": "architecture.httpClients",
+      "value": "HttpClient injected into components",
+      "kind": "content",
+      "pattern": "@inject\\s+HttpClient\\b",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.razor"
+      ]
+    },
+    {
+      "id": "arch.error.problemdetails",
+      "fact": "architecture.errorHandling",
+      "value": "ProblemDetails",
+      "kind": "content",
+      "pattern": "\\bAddProblemDetails\\s*\\(|Results\\.Problem\\s*\\(|TypedResults\\.Problem\\s*\\(",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.cs"
+      ]
+    },
+    {
+      "id": "arch.error.exceptionhandler",
+      "fact": "architecture.errorHandling",
+      "value": "IExceptionHandler",
+      "kind": "content",
+      "pattern": "\\bIExceptionHandler\\b|AddExceptionHandler\\s*<",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.cs"
+      ]
+    },
+    {
+      "id": "arch.error.result",
+      "fact": "architecture.errorHandling",
+      "value": "Result pattern",
+      "kind": "content",
+      "pattern": "\\bResult<[A-Z]\\w*>|\\bErrorOr<",
+      "confidence": "inferred",
+      "multi": true,
+      "files": [
+        "*.cs"
+      ]
+    },
+    {
+      "id": "arch.error.erroror",
+      "fact": "architecture.errorHandling",
+      "value": "ErrorOr",
+      "kind": "package",
+      "pattern": "^ErrorOr$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.error.fluentresults",
+      "fact": "architecture.errorHandling",
+      "value": "FluentResults",
+      "kind": "package",
+      "pattern": "^FluentResults$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.state.fluxor",
+      "fact": "architecture.state",
+      "value": "Fluxor",
+      "kind": "package",
+      "pattern": "^Fluxor",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.state.persistent",
+      "fact": "architecture.state",
+      "value": "PersistentComponentState",
+      "kind": "content",
+      "pattern": "\\bPersistentComponentState\\b|\\[PersistentState\\]|\\[SupplyParameterFromPersistentComponentState\\]",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.cs",
+        "*.razor"
+      ]
+    },
+    {
+      "id": "arch.state.cascading",
+      "fact": "architecture.state",
+      "value": "Cascading values",
+      "kind": "content",
+      "pattern": "<CascadingValue\\b|AddCascadingValue\\s*\\(",
+      "confidence": "inferred",
+      "multi": true,
+      "files": [
+        "*.cs",
+        "*.razor"
+      ]
+    },
+    {
+      "id": "arch.l10n.localization",
+      "fact": "architecture.localization",
+      "value": "ASP.NET Core localization",
+      "kind": "content",
+      "pattern": "\\bAddLocalization\\s*\\(|IStringLocalizer",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.cs",
+        "*.razor"
+      ]
+    },
+    {
+      "id": "arch.log.serilog",
+      "fact": "architecture.logging",
+      "value": "Serilog",
+      "kind": "package",
+      "pattern": "^Serilog",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.log.otel",
+      "fact": "architecture.logging",
+      "value": "OpenTelemetry",
+      "kind": "package",
+      "pattern": "^OpenTelemetry",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.log.appinsights",
+      "fact": "architecture.logging",
+      "value": "Application Insights",
+      "kind": "package",
+      "pattern": "^Microsoft\\.ApplicationInsights",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.resilience.polly",
+      "fact": "architecture.resilience",
+      "value": "Polly",
+      "kind": "package",
+      "pattern": "^Polly",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.resilience.msext",
+      "fact": "architecture.resilience",
+      "value": "Microsoft.Extensions.Http.Resilience",
+      "kind": "package",
+      "pattern": "^Microsoft\\.Extensions\\.Http\\.Resilience$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.cache.output",
+      "fact": "architecture.caching",
+      "value": "Output caching",
+      "kind": "content",
+      "pattern": "\\bAddOutputCache\\s*\\(",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.cs"
+      ]
+    },
+    {
+      "id": "arch.cache.hybrid",
+      "fact": "architecture.caching",
+      "value": "HybridCache",
+      "kind": "package",
+      "pattern": "^Microsoft\\.Extensions\\.Caching\\.Hybrid$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.cache.redis",
+      "fact": "architecture.caching",
+      "value": "Redis",
+      "kind": "package",
+      "pattern": "^(Microsoft\\.Extensions\\.Caching\\.StackExchangeRedis|StackExchange\\.Redis)$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.realtime.signalr",
+      "fact": "architecture.realtime",
+      "value": "SignalR client",
+      "kind": "package",
+      "pattern": "^Microsoft\\.AspNetCore\\.SignalR\\.Client$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.jobs.hangfire",
+      "fact": "architecture.backgroundJobs",
+      "value": "Hangfire",
+      "kind": "package",
+      "pattern": "^Hangfire",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.jobs.quartz",
+      "fact": "architecture.backgroundJobs",
+      "value": "Quartz",
+      "kind": "package",
+      "pattern": "^Quartz",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.aspire",
+      "fact": "architecture.orchestration",
+      "value": ".NET Aspire",
+      "kind": "package",
+      "pattern": "^Aspire\\.Hosting",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.flags",
+      "fact": "architecture.featureFlags",
+      "value": "Microsoft.FeatureManagement",
+      "kind": "package",
+      "pattern": "^Microsoft\\.FeatureManagement",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "arch.graph",
+      "fact": "architecture.externalApis",
+      "value": "Microsoft Graph SDK",
+      "kind": "package",
+      "pattern": "^Microsoft\\.Graph$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "sec.authn.entra",
+      "fact": "security.authentication",
+      "value": "Microsoft Entra ID (Microsoft.Identity.Web)",
+      "kind": "package",
+      "pattern": "^Microsoft\\.Identity\\.Web",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "sec.authn.entra.code",
+      "fact": "security.authentication",
+      "value": "Microsoft Entra ID (Microsoft.Identity.Web)",
+      "kind": "content",
+      "pattern": "AddMicrosoftIdentityWebApp|AddMicrosoftIdentityWebApi",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.cs"
+      ]
+    },
+    {
+      "id": "sec.authn.identity",
+      "fact": "security.authentication",
+      "value": "ASP.NET Core Identity",
+      "kind": "package",
+      "pattern": "^Microsoft\\.AspNetCore\\.Identity\\.EntityFrameworkCore$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "sec.authn.jwt",
+      "fact": "security.authentication",
+      "value": "JWT bearer",
+      "kind": "package",
+      "pattern": "^Microsoft\\.AspNetCore\\.Authentication\\.JwtBearer$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "sec.authn.oidc",
+      "fact": "security.authentication",
+      "value": "OpenID Connect",
+      "kind": "package",
+      "pattern": "^Microsoft\\.AspNetCore\\.Authentication\\.OpenIdConnect$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "sec.authn.cookie",
+      "fact": "security.authentication",
+      "value": "Cookie authentication",
+      "kind": "content",
+      "pattern": "\\.AddCookie\\s*\\(",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.cs"
+      ]
+    },
+    {
+      "id": "sec.authn.msal",
+      "fact": "security.authentication",
+      "value": "MSAL for WebAssembly",
+      "kind": "package",
+      "pattern": "^Microsoft\\.Authentication\\.WebAssembly\\.Msal$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "sec.authn.wasm",
+      "fact": "security.authentication",
+      "value": "WebAssembly authentication",
+      "kind": "package",
+      "pattern": "^Microsoft\\.AspNetCore\\.Components\\.WebAssembly\\.Authentication$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "sec.authz.attr",
+      "fact": "security.authorization",
+      "value": "[Authorize] attributes",
+      "kind": "content",
+      "pattern": "\\[Authorize\\b|@attribute\\s+\\[Authorize",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.cs",
+        "*.razor"
+      ]
+    },
+    {
+      "id": "sec.authz.policy",
+      "fact": "security.authorization",
+      "value": "Named policies",
+      "kind": "content",
+      "pattern": "\\.AddPolicy\\s*\\(|AddAuthorizationBuilder\\s*\\(\\s*\\)\\s*\\.AddPolicy",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.cs"
+      ]
+    },
+    {
+      "id": "sec.authz.endpoint",
+      "fact": "security.authorization",
+      "value": "Endpoint RequireAuthorization",
+      "kind": "content",
+      "pattern": "\\.RequireAuthorization\\s*\\(",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.cs"
+      ]
+    },
+    {
+      "id": "sec.authz.view",
+      "fact": "security.authorization",
+      "value": "AuthorizeView (UI only)",
+      "kind": "content",
+      "pattern": "<AuthorizeView\\b",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.razor"
+      ]
+    },
+    {
+      "id": "sec.authz.handler",
+      "fact": "security.authorization",
+      "value": "Authorization handlers",
+      "kind": "content",
+      "pattern": "\\bAuthorizationHandler<|\\bIAuthorizationHandler\\b",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.cs"
+      ]
+    },
+    {
+      "id": "sec.authz.fallback",
+      "fact": "security.authorization",
+      "value": "Fallback policy",
+      "kind": "content",
+      "pattern": "FallbackPolicy\\s*=",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.cs"
+      ]
+    },
+    {
+      "id": "sec.antiforgery",
+      "fact": "security.antiforgery",
+      "value": "Antiforgery middleware",
+      "kind": "content",
+      "pattern": "\\bUseAntiforgery\\s*\\(",
+      "confidence": "proven",
+      "multi": true,
+      "files": [
+        "*.cs"
+      ]
+    },
+    {
+      "id": "test.xunit",
+      "fact": "testing.framework",
+      "value": "xUnit",
+      "kind": "package",
+      "pattern": "^xunit(\\.v3)?$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.nunit",
+      "fact": "testing.framework",
+      "value": "NUnit",
+      "kind": "package",
+      "pattern": "^NUnit$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.mstest",
+      "fact": "testing.framework",
+      "value": "MSTest",
+      "kind": "package",
+      "pattern": "^MSTest(\\.TestFramework|\\.Sdk)?$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.tunit",
+      "fact": "testing.framework",
+      "value": "TUnit",
+      "kind": "package",
+      "pattern": "^TUnit$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.bunit",
+      "fact": "testing.component",
+      "value": "bUnit",
+      "kind": "package",
+      "pattern": "^bunit",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.playwright",
+      "fact": "testing.e2e",
+      "value": "Playwright",
+      "kind": "package",
+      "pattern": "^Microsoft\\.Playwright",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.selenium",
+      "fact": "testing.e2e",
+      "value": "Selenium",
+      "kind": "package",
+      "pattern": "^Selenium\\.WebDriver$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.fa",
+      "fact": "testing.assertions",
+      "value": "FluentAssertions",
+      "kind": "package",
+      "pattern": "^FluentAssertions$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.awesome",
+      "fact": "testing.assertions",
+      "value": "AwesomeAssertions",
+      "kind": "package",
+      "pattern": "^AwesomeAssertions$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.shouldly",
+      "fact": "testing.assertions",
+      "value": "Shouldly",
+      "kind": "package",
+      "pattern": "^Shouldly$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.moq",
+      "fact": "testing.mocking",
+      "value": "Moq",
+      "kind": "package",
+      "pattern": "^Moq$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.nsub",
+      "fact": "testing.mocking",
+      "value": "NSubstitute",
+      "kind": "package",
+      "pattern": "^NSubstitute$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.fakeiteasy",
+      "fact": "testing.mocking",
+      "value": "FakeItEasy",
+      "kind": "package",
+      "pattern": "^FakeItEasy$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.verify",
+      "fact": "testing.snapshot",
+      "value": "Verify",
+      "kind": "package",
+      "pattern": "^Verify\\.",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.mvctesting",
+      "fact": "testing.integration",
+      "value": "WebApplicationFactory",
+      "kind": "package",
+      "pattern": "^Microsoft\\.AspNetCore\\.Mvc\\.Testing$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.testcontainers",
+      "fact": "testing.integration",
+      "value": "Testcontainers",
+      "kind": "package",
+      "pattern": "^Testcontainers",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.respawn",
+      "fact": "testing.integration",
+      "value": "Respawn",
+      "kind": "package",
+      "pattern": "^Respawn$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.coverlet",
+      "fact": "testing.coverage",
+      "value": "coverlet",
+      "kind": "package",
+      "pattern": "^coverlet\\.",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.arch",
+      "fact": "testing.architecture",
+      "value": "Architecture tests",
+      "kind": "package",
+      "pattern": "^(NetArchTest\\.Rules|TngTech\\.ArchUnitNET)",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.bogus",
+      "fact": "testing.data",
+      "value": "Bogus",
+      "kind": "package",
+      "pattern": "^Bogus$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "test.autofixture",
+      "fact": "testing.data",
+      "value": "AutoFixture",
+      "kind": "package",
+      "pattern": "^AutoFixture",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "rt.editorconfig",
+      "fact": "runtime.codeStyle",
+      "value": ".editorconfig",
+      "kind": "file",
+      "pattern": "^\\.editorconfig$",
+      "confidence": "proven",
+      "multi": true
+    },
+    {
+      "id": "rt.analyzers",
+      "fact": "runtime.analyzers",
+      "value": "Roslyn analyzers",
+      "kind": "package",
+      "pattern": "(Analyzers$|^SonarAnalyzer\\.CSharp$|^StyleCop\\.Analyzers$|^Meziantou\\.Analyzer$|^Roslynator)",
+      "confidence": "proven",
+      "multi": true
+    }
+  ]
+}

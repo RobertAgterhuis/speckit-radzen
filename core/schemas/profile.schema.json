@@ -1,0 +1,221 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Spec Kit Radzen project profile",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "generatedAt",
+    "kitVersion",
+    "fingerprint",
+    "repository",
+    "runtime",
+    "blazor",
+    "radzen",
+    "architecture",
+    "security",
+    "testing",
+    "health",
+    "projects"
+  ],
+  "$defs": {
+    "fact": {
+      "title": "Detected fact",
+      "type": "object",
+      "required": [
+        "value",
+        "confidence",
+        "evidence"
+      ],
+      "properties": {
+        "value": {},
+        "confidence": {
+          "enum": [
+            "proven",
+            "inferred",
+            "unknown"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "factMap": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/fact"
+      }
+    }
+  },
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "generatedAt": {
+      "type": "string"
+    },
+    "kitVersion": {
+      "type": "string"
+    },
+    "fingerprint": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "repository": {
+      "type": "object",
+      "required": [
+        "solutions",
+        "solution",
+        "solutionSelection"
+      ],
+      "properties": {
+        "solutions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "solution": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "solutionSelection": {
+          "enum": [
+            "single",
+            "configured",
+            "ambiguous",
+            "none"
+          ]
+        },
+        "instructions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "agentEnvironment": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "runtime": {
+      "$ref": "#/$defs/factMap"
+    },
+    "blazor": {
+      "$ref": "#/$defs/factMap"
+    },
+    "radzen": {
+      "$ref": "#/$defs/factMap"
+    },
+    "architecture": {
+      "$ref": "#/$defs/factMap"
+    },
+    "security": {
+      "$ref": "#/$defs/factMap"
+    },
+    "testing": {
+      "$ref": "#/$defs/factMap"
+    },
+    "health": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "severity",
+          "message"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "severity": {
+            "enum": [
+              "blocker",
+              "major",
+              "minor",
+              "info"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "projects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "name",
+          "sdk",
+          "targetFrameworks",
+          "kind",
+          "packages",
+          "projectReferences"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "sdk": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "targetFrameworks": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "kind": {
+            "type": "string"
+          },
+          "packages": {
+            "type": "object",
+            "additionalProperties": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "projectReferences": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isTest": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

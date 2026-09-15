@@ -1,14 +1,12 @@
-# Definition of Done
-A Radzen feature is done when:
+# Definition of Done (G8)
+
 - [ ] Acceptance criteria are satisfied
 - [ ] Repository architecture/conventions are preserved
-- [ ] No unexplained scope creep exists
+- [ ] No unexplained scope creep
 - [ ] Required Radzen APIs were verified
-- [ ] Installed-version compatibility is proven by build
-- [ ] Relevant tests pass
-- [ ] Authorization is enforced at the trusted boundary
-- [ ] Loading/empty/error/validation/forbidden states were considered
-- [ ] Responsive behavior was reviewed
-- [ ] Accessibility baseline was reviewed
-- [ ] Credible data-volume/performance concerns were addressed
+- [ ] Build and relevant tests pass
+- [ ] Anti-pattern scan clean
+- [ ] Authorization enforced at the trusted boundary
+- [ ] UI states considered
+- [ ] Responsive and accessibility baseline reviewed
 - [ ] No unresolved stop condition remains

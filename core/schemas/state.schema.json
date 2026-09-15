@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Spec Kit Radzen feature state",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "feature",
+    "number",
+    "name",
+    "phase",
+    "created",
+    "updated",
+    "gates",
+    "slices",
+    "history",
+    "mcp"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "feature": {
+      "type": "string",
+      "pattern": "^[0-9]{3}-[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "number": {
+      "type": "string",
+      "pattern": "^[0-9]{3}$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "phase": {
+      "enum": [
+        "bootstrap",
+        "discover",
+        "specify",
+        "clarify",
+        "plan",
+        "tasks",
+        "analyze",
+        "implement",
+        "review",
+        "done"
+      ]
+    },
+    "created": {
+      "type": "string"
+    },
+    "updated": {
+      "type": "string"
+    },
+    "mcp": {
+      "type": "object",
+      "required": [
+        "availability"
+      ],
+      "properties": {
+        "availability": {
+          "enum": [
+            "unknown",
+            "available",
+            "unavailable",
+            "quota-exhausted"
+          ]
+        },
+        "recordedAt": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "note": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "patternProperties": {
+        "^G[0-8]$": {
+          "type": "object",
+          "required": [
+            "status",
+            "at"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "pass",
+                "fail",
+                "waived",
+                "error"
+              ]
+            },
+            "at": {
+              "type": "string"
+            },
+            "slice": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "codeFingerprint": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "slices": {
+      "type": "object",
+      "patternProperties": {
+        "^S-[0-9]{2}$": {
+          "type": "object",
+          "required": [
+            "status"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "pending",
+                "in-progress",
+                "done"
+              ]
+            },
+            "at": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "g5": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "g6": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "at",
+          "event"
+        ],
+        "properties": {
+          "at": {
+            "type": "string"
+          },
+          "event": {
+            "type": "string"
+          },
+          "detail": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "baseRef": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

@@ -1,0 +1,20 @@
+@page "/customers"
+
+<PageTitle>Customers</PageTitle>
+
+<RadzenStack Gap="1rem">
+    <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H1">Customers</RadzenText>
+
+    <RadzenFormField Text="Search by name" Style="width: 100%; max-width: 28rem;">
+        <RadzenTextBox @bind-Value="@nameFilter" Change="@OnSearchAsync" />
+    </RadzenFormField>
+
+    <RadzenDataGrid @ref="grid" TItem="CustomerSummary" Data="@customers" Count="@count" LoadData="@LoadDataAsync"
+                    IsLoading="@isLoading" AllowPaging="true" PageSize="@CustomerQuery.DefaultPageSize"
+                    EmptyText="No customers found.">
+        <Columns>
+            <RadzenDataGridColumn TItem="CustomerSummary" Property="@nameof(CustomerSummary.Name)" Title="Name" />
+            <RadzenDataGridColumn TItem="CustomerSummary" Property="@nameof(CustomerSummary.City)" Title="City" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>

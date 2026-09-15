@@ -1,0 +1,19 @@
+{
+  "phases": [
+    { "id": "bootstrap", "number": "00", "title": "Bootstrap", "summary": "Detect the project, check MCP, create the feature folder and pass G0.", "workflow": "00-bootstrap.md", "gate": "G0", "role": null },
+    { "id": "discover", "number": "01", "title": "Discover", "summary": "Trace the feature through the repository and write discovery.md (G1).", "workflow": "01-discover.md", "gate": "G1", "role": "discoverer" },
+    { "id": "specify", "number": "02", "title": "Specify", "summary": "Write spec.md and gap-analysis.md with FR/AC, authorization, data volume and UI states.", "workflow": "02-specify.md", "gate": null, "role": "specifier" },
+    { "id": "clarify", "number": "03", "title": "Clarify", "summary": "Resolve material questions and pass G2.", "workflow": "03-clarify.md", "gate": "G2", "role": "specifier" },
+    { "id": "plan", "number": "04", "title": "Plan", "summary": "Write plan.md with MCP-verified component strategy and slices, plus test-scenarios.md (G3).", "workflow": "04-plan.md", "gate": "G3", "role": "planner" },
+    { "id": "tasks", "number": "05", "title": "Tasks", "summary": "Break slices into traceable tasks in tasks.md.", "workflow": "05-tasks.md", "gate": null, "role": "planner" },
+    { "id": "analyze", "number": "06", "title": "Analyze", "summary": "Check cross-artifact consistency and MCP evidence (G4).", "workflow": "06-analyze.md", "gate": "G4", "role": "planner" },
+    { "id": "implement", "number": "07", "title": "Implement", "summary": "Implement one slice at a time with the MCP loop; pass G5 and G6 per slice.", "workflow": "07-implement.md", "gate": "G5/G6", "role": "implementer" },
+    { "id": "review", "number": "08", "title": "Review", "summary": "Review against the requirement and checklists; pass G7.", "workflow": "08-review.md", "gate": "G7", "role": "reviewer" },
+    { "id": "done", "number": "09", "title": "Done", "summary": "Apply the Definition of Done and pass G8.", "workflow": "09-done.md", "gate": "G8", "role": null }
+  ],
+  "utilities": [
+    { "id": "status", "title": "Status", "summary": "Show kit, profile, MCP status and feature state with the next step." },
+    { "id": "gate", "title": "Gate", "summary": "Run a quality gate (G0–G8) and report its checks." },
+    { "id": "scan", "title": "Scan", "summary": "Run the anti-pattern scanner on changed files and explain findings." }
+  ]
+}

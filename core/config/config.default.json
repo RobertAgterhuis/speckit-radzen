@@ -1,0 +1,36 @@
+{
+  "solution": null,
+  "specsDirectory": "specs",
+  "scan": {
+    "excludePaths": [
+      "**/wwwroot/lib/**",
+      "**/*.g.cs",
+      "**/Migrations/**"
+    ],
+    "disabledRules": [],
+    "severityOverrides": {},
+    "waivers": []
+  },
+  "gates": {
+    "G0": {
+      "allowHealth": []
+    },
+    "G4": {
+      "maxEvidenceRank": 3
+    },
+    "G5": {
+      "enabled": true,
+      "allowNewWarnings": 0,
+      "testFilter": null,
+      "buildConfiguration": "Debug",
+      "timeoutMinutes": 20,
+      "runTests": true
+    },
+    "G6": {
+      "failOn": [
+        "blocker",
+        "major"
+      ]
+    }
+  }
+}

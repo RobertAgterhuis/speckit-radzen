@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Spec Kit Radzen repository configuration",
+  "type": "object",
+  "properties": {
+    "solution": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "specsDirectory": {
+      "type": "string"
+    },
+    "scan": {
+      "type": "object",
+      "properties": {
+        "excludePaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "disabledRules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "severityOverrides": {
+          "type": "object",
+          "additionalProperties": {
+            "enum": [
+              "blocker",
+              "major",
+              "minor"
+            ]
+          }
+        },
+        "waivers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "rule",
+              "path",
+              "reason"
+            ],
+            "properties": {
+              "rule": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 3
+              }
+            }
+          }
+        }
+      }
+    },
+    "gates": {
+      "type": "object",
+      "properties": {
+        "G5": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "allowNewWarnings": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "testFilter": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "buildConfiguration": {
+              "type": "string"
+            },
+            "timeoutMinutes": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "runTests": {
+              "type": "boolean"
+            }
+          }
+        },
+        "G4": {
+          "type": "object",
+          "properties": {
+            "maxEvidenceRank": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4
+            }
+          }
+        },
+        "G6": {
+          "type": "object",
+          "properties": {
+            "failOn": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "blocker",
+                  "major",
+                  "minor"
+                ]
+              }
+            }
+          }
+        },
+        "G0": {
+          "type": "object",
+          "properties": {
+            "allowHealth": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

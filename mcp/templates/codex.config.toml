@@ -1,0 +1,6 @@
+# Radzen Blazor MCP for Codex.
+# Place in ~/.codex/config.toml (user) or <repo>/.codex/config.toml (trusted projects only).
+# The key is read from the RADZEN_MCP_KEY environment variable; never put it in this file.
+[mcp_servers.radzen-blazor]
+url = "https://app.radzen.com/mcp"
+env_http_headers = { "X-Radzen-Key" = "RADZEN_MCP_KEY" }

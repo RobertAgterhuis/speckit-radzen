@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "radzen-blazor": {
+      "type": "http",
+      "url": "https://app.radzen.com/mcp",
+      "headers": {
+        "X-Radzen-Key": "${RADZEN_MCP_KEY}"
+      }
+    }
+  }
+}

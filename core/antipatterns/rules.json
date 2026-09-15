@@ -1,0 +1,1157 @@
+{
+  "schemaVersion": 1,
+  "rules": [
+    {
+      "id": "AP-RDZ-01",
+      "title": "Invented Radzen API",
+      "severity": "blocker",
+      "category": "RDZ",
+      "detection": "tool",
+      "principles": [
+        "P-03",
+        "P-15"
+      ],
+      "doc": "rdz.md#ap-rdz-01",
+      "why": "Members that do not exist in the installed Radzen.Blazor version compile-fail at best and silently misbehave at worst (for example an unknown attribute captured by an attribute splat).",
+      "fix": "Look the member up through the Radzen MCP, record MCP-### evidence, and let G5 prove it compiles. Never copy members from other component libraries.",
+      "bad": "<RadzenDataGrid SmartPaging=\"true\" RowsPerPageSelector=\"10,20\" />   @* members that do not exist *@",
+      "mcpQuery": "<Component> <member> parameter in Radzen.Blazor <version>",
+      "message": "Verified by G4 (evidence) and G5 (build).",
+      "tool": "G4 evidence check + G5 build"
+    },
+    {
+      "id": "AP-RDZ-02",
+      "title": "Data grid bound to a fully materialized collection",
+      "severity": "major",
+      "category": "RDZ",
+      "detection": "regex",
+      "principles": [
+        "P-10"
+      ],
+      "doc": "rdz.md#ap-rdz-02",
+      "why": "A grid with Data= and no LoadData pages, sorts and filters in the browser/circuit after loading every row. Fine for small bounded lists; a performance and memory problem for unbounded data.",
+      "fix": "Use LoadData with server-side paging/sorting/filtering, Count and IsLoading. If the collection is provably bounded, waive with the bound as reason.",
+      "bad": "<RadzenDataGrid Data=\"@allCustomers\" AllowPaging=\"true\">",
+      "good": "<RadzenDataGrid Data=\"@page\" Count=\"@total\" LoadData=\"@LoadData\" IsLoading=\"@loading\" AllowPaging=\"true\">",
+      "mcpQuery": "RadzenDataGrid LoadData server-side paging sorting filtering with Count and IsLoading",
+      "files": [
+        "*.razor"
+      ],
+      "pattern": "<RadzenDataGrid\\b(?![^>]*\\bLoadData\\s*=)[^>]*\\bData\\s*=[^>]*>",
+      "message": "RadzenDataGrid uses Data= without LoadData; confirm the data is bounded or switch to server-side LoadData."
+    },
+    {
+      "id": "AP-RDZ-03",
+      "title": "LoadData without Count",
+      "severity": "major",
+      "category": "RDZ",
+      "detection": "regex",
+      "principles": [
+        "P-10",
+        "P-08"
+      ],
+      "doc": "rdz.md#ap-rdz-03",
+      "why": "Without Count the pager cannot know the total number of rows; paging breaks or shows one page only.",
+      "fix": "Set Count to the total number of matching rows returned by the server query.",
+      "bad": "<RadzenDataGrid Data=\"@page\" LoadData=\"@LoadData\" AllowPaging=\"true\">",
+      "good": "<RadzenDataGrid Data=\"@page\" Count=\"@total\" LoadData=\"@LoadData\" AllowPaging=\"true\">",
+      "mcpQuery": "RadzenDataGrid LoadData Count total rows paging",
+      "files": [
+        "*.razor"
+      ],
+      "pattern": "<RadzenDataGrid\\b(?=[^>]*\\bLoadData\\s*=)(?![^>]*\\bCount\\s*=)[^>]*>"
+    },
+    {
+      "id": "AP-RDZ-04",
+      "title": "Server query built from the raw filter string",
+      "severity": "major",
+      "category": "RDZ",
+      "detection": "regex",
+      "principles": [
+        "P-07",
+        "P-10"
+      ],
+      "doc": "rdz.md#ap-rdz-04",
+      "why": "LoadDataArgs.Filter is an expression string generated in the browser. Passing it into a server-side dynamic query or an OData/query-string parameter lets a client shape the query.",
+      "fix": "Translate the structured filters (LoadDataArgs.Filters / column filter values) into typed query parameters, or use the Radzen helpers against the grid columns on a trusted IQueryable. Validate allowed fields and operators on the server.",
+      "bad": "var url = $\"api/customers?$filter={args.Filter}\";",
+      "good": "var query = new CustomerQuery(args.Skip, args.Top, nameFilter);",
+      "mcpQuery": "RadzenDataGrid LoadDataArgs Filters FilterDescriptor server-side query without Filter string",
+      "files": [
+        "*.razor",
+        "*.cs"
+      ],
+      "pattern": "(\\.Where\\s*\\(\\s*\\w*[Aa]rgs\\.Filter\\s*\\)|\\{\\s*\\w*[Aa]rgs\\.Filter\\s*\\}|\\+\\s*\\w*[Aa]rgs\\.Filter\\b)"
+    },
+    {
+      "id": "AP-RDZ-05",
+      "title": "Dialog/notification services without component host",
+      "severity": "blocker",
+      "category": "RDZ",
+      "detection": "tool",
+      "principles": [
+        "P-16"
+      ],
+      "doc": "rdz.md#ap-rdz-05",
+      "why": "DialogService and NotificationService only render when <RadzenComponents /> (or the individual hosts in older versions) is in the layout; otherwise calls silently do nothing.",
+      "fix": "Add <RadzenComponents /> to the main layout with the correct @rendermode (see profile).",
+      "bad": "@inject DialogService Dialogs   (no <RadzenComponents /> anywhere)",
+      "good": "MainLayout.razor: <RadzenComponents @rendermode=\"InteractiveServer\" />",
+      "mcpQuery": "Radzen Blazor RadzenComponents host DialogService NotificationService",
+      "message": "Reported by project detection (health RDZ-H02).",
+      "tool": "profile health RDZ-H02"
+    },
+    {
+      "id": "AP-RDZ-06",
+      "title": "Radzen services not registered",
+      "severity": "blocker",
+      "category": "RDZ",
+      "detection": "tool",
+      "principles": [
+        "P-16"
+      ],
+      "doc": "rdz.md#ap-rdz-06",
+      "why": "Components that inject DialogService, NotificationService, TooltipService or ContextMenuService throw at runtime when the services are not registered.",
+      "fix": "Call builder.Services.AddRadzenComponents() in every host that renders Radzen components (server and WebAssembly client).",
+      "bad": "Program.cs without AddRadzenComponents()",
+      "good": "builder.Services.AddRadzenComponents();",
+      "mcpQuery": "Radzen Blazor AddRadzenComponents registration",
+      "message": "Reported by project detection (health RDZ-H01).",
+      "tool": "profile health RDZ-H01"
+    },
+    {
+      "id": "AP-RDZ-07",
+      "title": "Dialog result used without null check",
+      "severity": "major",
+      "category": "RDZ",
+      "detection": "regex",
+      "principles": [
+        "P-08"
+      ],
+      "doc": "rdz.md#ap-rdz-07",
+      "why": "OpenAsync returns null when the user closes the dialog (Esc, X, Cancel). Casting or dereferencing the awaited result directly throws.",
+      "fix": "Pattern-match the result: if (await Dialogs.OpenAsync<Edit>(...) is Customer saved) { ... }.",
+      "bad": "var c = (Customer)await DialogService.OpenAsync<EditCustomer>(\"Edit\");",
+      "good": "if (await DialogService.OpenAsync<EditCustomer>(\"Edit\") is Customer c) { ... }",
+      "mcpQuery": "Radzen DialogService OpenAsync result when dialog is closed",
+      "files": [
+        "*.razor",
+        "*.cs"
+      ],
+      "pattern": "(\\(\\s*[A-Z]\\w*\\s*\\)\\s*await\\s+\\w*[Dd]ialog\\w*\\.Open\\w*Async\\b|\\(\\s*await\\s+\\w*[Dd]ialog\\w*\\.Open\\w*Async\\b[^;]*\\)\\s*\\.\\w)"
+    },
+    {
+      "id": "AP-RDZ-08",
+      "title": "Grid reload inside a loop",
+      "severity": "minor",
+      "category": "RDZ",
+      "detection": "regex",
+      "principles": [
+        "P-10"
+      ],
+      "doc": "rdz.md#ap-rdz-08",
+      "why": "Each Reload triggers LoadData and a render; calling it per item multiplies server calls.",
+      "fix": "Perform the batch operation, then call Reload once.",
+      "files": [
+        "*.razor",
+        "*.cs"
+      ],
+      "pattern": "(foreach|for|while)\\s*\\([^)]*\\)\\s*\\{[^{}]*\\.Reload\\s*\\("
+    },
+    {
+      "id": "AP-RDZ-09",
+      "title": "Theme registered twice",
+      "severity": "major",
+      "category": "RDZ",
+      "detection": "regex",
+      "principles": [
+        "P-16"
+      ],
+      "doc": "rdz.md#ap-rdz-09",
+      "why": "Combining <RadzenTheme> with a hard-coded theme stylesheet loads two themes; styles conflict and runtime theme switching breaks.",
+      "fix": "Use one mechanism, following the profile (radzen.theme).",
+      "files": [
+        "*.razor",
+        "*.cshtml",
+        "*.html"
+      ],
+      "pattern": "_content/Radzen\\.Blazor/css/[\\w-]+\\.css",
+      "requires": "<RadzenTheme\\b"
+    },
+    {
+      "id": "AP-RDZ-10",
+      "title": "Hand-built controls where Radzen is the standard",
+      "severity": "minor",
+      "category": "RDZ",
+      "detection": "manual-review",
+      "principles": [
+        "P-05",
+        "P-02"
+      ],
+      "doc": "rdz.md#ap-rdz-10",
+      "why": "Raw <table>/<input> markup next to Radzen components creates inconsistent look, keyboard behaviour and accessibility.",
+      "fix": "Use the repository wrapper or the Radzen component, unless there is a documented reason."
+    },
+    {
+      "id": "AP-RDZ-11",
+      "title": "Floating Radzen.Blazor version",
+      "severity": "minor",
+      "category": "RDZ",
+      "detection": "regex",
+      "principles": [
+        "P-04"
+      ],
+      "doc": "rdz.md#ap-rdz-11",
+      "why": "Wildcard versions change the component API between builds; evidence recorded for one version may not hold for the next.",
+      "fix": "Pin the version (or pin it centrally in Directory.Packages.props).",
+      "files": [
+        "*.csproj",
+        "Directory.Packages.props"
+      ],
+      "pattern": "Include=\"Radzen\\.Blazor\"[^>]*Version=\"[^\"]*\\*"
+    },
+    {
+      "id": "AP-RDZ-12",
+      "title": "Overriding Radzen internal CSS classes",
+      "severity": "minor",
+      "category": "RDZ",
+      "detection": "regex",
+      "principles": [
+        "P-02"
+      ],
+      "doc": "rdz.md#ap-rdz-12",
+      "why": "Styling internal rz-* classes couples the app to Radzen internals that can change between versions.",
+      "fix": "Use theme variables (CSS custom properties) or component Style/CssClass parameters.",
+      "files": [
+        "*.css",
+        "*.scss",
+        "*.razor.css"
+      ],
+      "pattern": "(^|[\\s,}])\\.rz-[a-z0-9-]+[^{]*\\{"
+    },
+    {
+      "id": "AP-RDZ-13",
+      "title": "Component host without interactive render mode",
+      "severity": "major",
+      "category": "RDZ",
+      "detection": "tool",
+      "principles": [
+        "P-16"
+      ],
+      "doc": "rdz.md#ap-rdz-13",
+      "why": "With per-page render modes, a <RadzenComponents /> host without @rendermode renders statically, so dialogs, notifications and tooltips never appear.",
+      "fix": "Give the host the application render mode: <RadzenComponents @rendermode=\"InteractiveAuto\" />.",
+      "message": "Reported by project detection (health RND-H02).",
+      "tool": "profile health RND-H02"
+    },
+    {
+      "id": "AP-RDZ-14",
+      "title": "LoadData grid without loading state",
+      "severity": "minor",
+      "category": "RDZ",
+      "detection": "regex",
+      "principles": [
+        "P-08"
+      ],
+      "doc": "rdz.md#ap-rdz-14",
+      "why": "Without IsLoading the grid shows stale or empty rows while the server call runs.",
+      "fix": "Bind IsLoading and set it around the server call.",
+      "files": [
+        "*.razor"
+      ],
+      "pattern": "<RadzenDataGrid\\b(?=[^>]*\\bLoadData\\s*=)(?![^>]*\\bIsLoading\\s*=)[^>]*>"
+    },
+    {
+      "id": "AP-RND-01",
+      "title": "Interactive component on a static page",
+      "severity": "major",
+      "category": "RND",
+      "detection": "tool",
+      "principles": [
+        "P-16"
+      ],
+      "doc": "rnd.md#ap-rnd-01",
+      "why": "In a Blazor Web App, pages without an interactive render mode are static SSR: Radzen events (Click, Change, LoadData) never fire.",
+      "fix": "Apply the render mode used by the analogous feature (@rendermode or the global Routes render mode).",
+      "message": "Reported by project detection (health RND-H01); review the changed page render mode.",
+      "tool": "profile health RND-H01 + manual review of the changed page"
+    },
+    {
+      "id": "AP-RND-02",
+      "title": "Data loaded twice because of prerendering",
+      "severity": "major",
+      "category": "RND",
+      "detection": "manual-review",
+      "principles": [
+        "P-16",
+        "P-10"
+      ],
+      "doc": "rnd.md#ap-rnd-02",
+      "why": "With prerendering, OnInitializedAsync runs on the server prerender and again when the component becomes interactive: two backend calls and a flicker.",
+      "fix": "Persist prerendered state (PersistentComponentState / [PersistentState]) or follow the repository approach; for LoadData grids, remember LoadData is not raised during prerender."
+    },
+    {
+      "id": "AP-RND-03",
+      "title": "JavaScript interop during initialization",
+      "severity": "major",
+      "category": "RND",
+      "detection": "regex",
+      "principles": [
+        "P-16"
+      ],
+      "doc": "rnd.md#ap-rnd-03",
+      "why": "JS interop is not available during prerendering; calls in OnInitialized(Async) throw.",
+      "fix": "Move interop to OnAfterRenderAsync(firstRender).",
+      "files": [
+        "*.razor",
+        "*.cs"
+      ],
+      "pattern": "OnInitialized(Async)?\\s*\\(\\s*\\)\\s*(\\{[^}]*|=>[^;]*)\\bJS(Runtime)?\\.Invoke"
+    },
+    {
+      "id": "AP-RND-04",
+      "title": "async void method",
+      "severity": "major",
+      "category": "RND",
+      "detection": "regex",
+      "principles": [
+        "P-12"
+      ],
+      "doc": "rnd.md#ap-rnd-04",
+      "why": "Exceptions from async void are not observed by Blazor’s error handling and can crash the circuit; the renderer also cannot await the handler.",
+      "fix": "Return Task (Blazor awaits Task-returning event handlers).",
+      "bad": "async void Delete() { await Api.DeleteAsync(id); }",
+      "good": "async Task Delete() { await Api.DeleteAsync(id); }",
+      "files": [
+        "*.razor",
+        "*.cs"
+      ],
+      "pattern": "\\basync\\s+void\\s+\\w+\\s*\\("
+    },
+    {
+      "id": "AP-RND-05",
+      "title": "Blocking on async code",
+      "severity": "major",
+      "category": "RND",
+      "detection": "regex",
+      "principles": [
+        "P-12"
+      ],
+      "doc": "rnd.md#ap-rnd-05",
+      "why": ".Result, .Wait() and GetAwaiter().GetResult() block the renderer thread and can deadlock (always on WebAssembly).",
+      "fix": "await the task.",
+      "files": [
+        "*.razor",
+        "*.cs"
+      ],
+      "pattern": "(Async\\s*\\([^()]*\\)\\s*\\.Result\\b|\\.Wait\\s*\\(\\s*\\)|\\.GetAwaiter\\s*\\(\\s*\\)\\s*\\.GetResult\\s*\\(\\s*\\))"
+    },
+    {
+      "id": "AP-RND-06",
+      "title": "StateHasChanged inside a loop",
+      "severity": "minor",
+      "category": "RND",
+      "detection": "regex",
+      "principles": [
+        "P-10"
+      ],
+      "doc": "rnd.md#ap-rnd-06",
+      "why": "Re-rendering per iteration is expensive and rarely needed.",
+      "fix": "Update state, then call StateHasChanged once (or rely on the automatic render after the handler).",
+      "files": [
+        "*.razor",
+        "*.cs"
+      ],
+      "pattern": "(foreach|for|while)\\s*\\([^)]*\\)\\s*\\{[^{}]*StateHasChanged\\s*\\("
+    },
+    {
+      "id": "AP-RND-07",
+      "title": "Missing @key on dynamic lists",
+      "severity": "minor",
+      "category": "RND",
+      "detection": "manual-review",
+      "principles": [
+        "P-10"
+      ],
+      "doc": "rnd.md#ap-rnd-07",
+      "why": "Without @key, re-ordered lists re-use component instances and state leaks between rows.",
+      "fix": "Add @key with a stable identifier in loops that render components."
+    },
+    {
+      "id": "AP-SEC-01",
+      "title": "UI visibility used as authorization",
+      "severity": "blocker",
+      "category": "SEC",
+      "detection": "manual-review",
+      "principles": [
+        "P-07"
+      ],
+      "doc": "sec.md#ap-sec-01",
+      "why": "Hiding or disabling a button does not stop a user calling the operation. The browser is not a trusted boundary.",
+      "fix": "Enforce the policy at the server/application boundary (endpoint, application service). UI checks are UX only. Record the enforcement point in the spec authorization matrix.",
+      "bad": "<AuthorizeView Roles=\"Admin\"><RadzenButton Click=\"@Delete\" /></AuthorizeView>  (DELETE endpoint has no policy)",
+      "good": "app.MapDelete(\"/api/users/{id}\", ...).RequireAuthorization(\"UsersDelete\");  + AuthorizeView for UX"
+    },
+    {
+      "id": "AP-SEC-02",
+      "title": "Endpoint used by a new screen lacks authorization",
+      "severity": "blocker",
+      "category": "SEC",
+      "detection": "manual-review",
+      "principles": [
+        "P-07"
+      ],
+      "doc": "sec.md#ap-sec-02",
+      "why": "A new UI often calls an existing endpoint that was internal or anonymous.",
+      "fix": "Check every endpoint in the feature trace for [Authorize]/RequireAuthorization or a fallback policy; add a policy in scope when missing."
+    },
+    {
+      "id": "AP-SEC-03",
+      "title": "Exception details shown to users",
+      "severity": "major",
+      "category": "SEC",
+      "detection": "regex",
+      "principles": [
+        "P-07"
+      ],
+      "doc": "sec.md#ap-sec-03",
+      "why": "Exception messages and stack traces leak internals (SQL, paths, tokens).",
+      "fix": "Show a safe message; log the exception with correlation id; follow the repository error contract (ProblemDetails).",
+      "bad": "Notifications.Notify(NotificationSeverity.Error, \"Failed\", ex.Message);",
+      "good": "Notifications.Notify(NotificationSeverity.Error, \"Saving failed\", \"Please try again. Reference: \" + traceId);",
+      "files": [
+        "*.razor",
+        "*.cs"
+      ],
+      "pattern": "(Notify\\s*\\([^;]*\\b(ex|exc|exception|e)\\.(Message|StackTrace|ToString\\s*\\(\\s*\\))|Detail\\s*=\\s*(ex|exc|exception|e)\\.(Message|StackTrace|ToString\\s*\\(\\s*\\))|@(ex|exception)\\.(Message|StackTrace))"
+    },
+    {
+      "id": "AP-SEC-04",
+      "title": "Credentials in configuration files",
+      "severity": "blocker",
+      "category": "SEC",
+      "detection": "regex",
+      "principles": [
+        "P-07"
+      ],
+      "doc": "sec.md#ap-sec-04",
+      "why": "Passwords in connection strings in tracked configuration end up in source control and build artifacts.",
+      "fix": "Use user secrets, environment variables, managed identity or a secret store.",
+      "files": [
+        "appsettings*.json",
+        "*.config"
+      ],
+      "pattern": "(?i)\\b(password|pwd)\\s*=\\s*[^;\"\\s]{3,}",
+      "unless": "(?i)(password|pwd)\\s*=\\s*(\\{|\\$\\(|#\\{|<|\\*|your|changeme|placeholder|secret\\b)"
+    },
+    {
+      "id": "AP-SEC-05",
+      "title": "Radzen MCP key committed",
+      "severity": "blocker",
+      "category": "SEC",
+      "detection": "regex",
+      "principles": [
+        "P-07"
+      ],
+      "doc": "sec.md#ap-sec-05",
+      "why": "The X-Radzen-Key licence key grants MCP access to anyone who reads the repository.",
+      "fix": "Remove the key, rotate it, reference RADZEN_MCP_KEY or an input prompt (mcp/templates).",
+      "files": [
+        "*.json",
+        "*.toml",
+        "*.md",
+        "*.yml",
+        "*.yaml",
+        "*.cs",
+        "*.ps1",
+        "*.sh",
+        "*.env"
+      ],
+      "pattern": "(?i)X-Radzen-Key[\"']?\\s*[:=]\\s*[\"'](?!\\s*\\$\\{)[A-Za-z0-9_\\-\\.]{12,}[\"']",
+      "unless": "(?i)(your|placeholder|license-key|xxxx)"
+    },
+    {
+      "id": "AP-SEC-06",
+      "title": "AllowAnonymous on a feature page or endpoint",
+      "severity": "major",
+      "category": "SEC",
+      "detection": "regex",
+      "principles": [
+        "P-07"
+      ],
+      "doc": "sec.md#ap-sec-06",
+      "why": "Anonymous access on a page or endpoint that belongs to a protected feature bypasses the fallback policy.",
+      "fix": "Remove it, or record the approved reason as a waiver.",
+      "files": [
+        "*.razor",
+        "*.cs"
+      ],
+      "pattern": "\\[AllowAnonymous\\]|\\.AllowAnonymous\\s*\\("
+    },
+    {
+      "id": "AP-SEC-07",
+      "title": "Rendering raw HTML",
+      "severity": "major",
+      "category": "SEC",
+      "detection": "regex",
+      "principles": [
+        "P-07"
+      ],
+      "doc": "sec.md#ap-sec-07",
+      "why": "MarkupString renders unencoded HTML; user-controlled content becomes an XSS vector.",
+      "fix": "Render text normally, or sanitize with an approved sanitizer and waive with reason.",
+      "files": [
+        "*.razor",
+        "*.cs"
+      ],
+      "pattern": "\\(\\s*MarkupString\\s*\\)|new\\s+MarkupString\\s*\\("
+    },
+    {
+      "id": "AP-SEC-08",
+      "title": "Over-fetching sensitive data",
+      "severity": "major",
+      "category": "SEC",
+      "detection": "manual-review",
+      "principles": [
+        "P-07"
+      ],
+      "doc": "sec.md#ap-sec-08",
+      "why": "Returning full entities to the UI exposes fields the screen does not need.",
+      "fix": "Project to a DTO with only the fields in the spec data requirements."
+    },
+    {
+      "id": "AP-SEC-09",
+      "title": "Antiforgery disabled",
+      "severity": "major",
+      "category": "SEC",
+      "detection": "regex",
+      "principles": [
+        "P-07"
+      ],
+      "doc": "sec.md#ap-sec-09",
+      "why": "Disabling antiforgery on forms or endpoints enables CSRF.",
+      "fix": "Keep antiforgery; for APIs use token-based auth where antiforgery does not apply.",
+      "files": [
+        "*.razor",
+        "*.cs"
+      ],
+      "pattern": "\\[IgnoreAntiforgeryToken\\]|\\.DisableAntiforgery\\s*\\("
+    },
+    {
+      "id": "AP-SEC-10",
+      "title": "Secrets written to logs",
+      "severity": "major",
+      "category": "SEC",
+      "detection": "regex",
+      "principles": [
+        "P-07"
+      ],
+      "doc": "sec.md#ap-sec-10",
+      "why": "Tokens and passwords in logs are readable by anyone with log access.",
+      "fix": "Log identifiers, not secrets.",
+      "files": [
+        "*.razor",
+        "*.cs"
+      ],
+      "pattern": "(?i)\\bLog(Trace|Debug|Information|Warning|Error|Critical)\\s*\\([^;]*\\{\\s*(password|accessToken|refreshToken|secret|apiKey|clientSecret)\\s*\\}"
+    },
+    {
+      "id": "AP-FRM-01",
+      "title": "Persistence entity bound directly to a form",
+      "severity": "major",
+      "category": "FRM",
+      "detection": "tool",
+      "principles": [
+        "P-06"
+      ],
+      "doc": "frm.md#ap-frm-01",
+      "why": "Binding EF entities to forms leaks persistence concerns into UI, risks over-posting and tracks changes unintentionally.",
+      "fix": "Bind a view model/DTO and map it in the application layer, as the repository does.",
+      "bad": "<RadzenTemplateForm TItem=\"Customer\" ...>  (Customer is a DbSet entity)",
+      "good": "<RadzenTemplateForm TItem=\"CustomerEditModel\" ...>",
+      "files": [
+        "*.razor"
+      ],
+      "message": "Form TItem is an EF entity type (DbSet<{0}>).",
+      "tool": "scanner: TItem compared with DbSet<T> entity types"
+    },
+    {
+      "id": "AP-FRM-02",
+      "title": "Submit without busy/double-submit protection",
+      "severity": "minor",
+      "category": "FRM",
+      "detection": "absence",
+      "principles": [
+        "P-08"
+      ],
+      "doc": "frm.md#ap-frm-02",
+      "why": "Users can submit twice while the first request runs, creating duplicates.",
+      "fix": "Disable the submit button while busy (RadzenButton IsBusy/Disabled) and ignore re-entrant submits.",
+      "files": [
+        "*.razor"
+      ],
+      "pattern": "<RadzenTemplateForm\\b[^>]*\\bSubmit\\s*=",
+      "requires": "\\bIsBusy\\s*=|\\bDisabled\\s*=|\\bdisabled\\b"
+    },
+    {
+      "id": "AP-FRM-03",
+      "title": "Client-only validation",
+      "severity": "major",
+      "category": "FRM",
+      "detection": "manual-review",
+      "principles": [
+        "P-06",
+        "P-07"
+      ],
+      "doc": "frm.md#ap-frm-03",
+      "why": "Validation in the component only improves UX; the server must enforce business rules.",
+      "fix": "Confirm the trusted layer validates the same rules (discovery → validation)."
+    },
+    {
+      "id": "AP-FRM-04",
+      "title": "Swallowed exception",
+      "severity": "major",
+      "category": "FRM",
+      "detection": "regex",
+      "principles": [
+        "P-12"
+      ],
+      "doc": "frm.md#ap-frm-04",
+      "why": "An empty catch hides failures; the UI shows success while the operation failed.",
+      "fix": "Handle the specific exception, show a safe message, log it; or let it propagate to the error boundary.",
+      "files": [
+        "*.razor",
+        "*.cs"
+      ],
+      "pattern": "catch\\s*(\\([^)]*\\))?\\s*\\{\\s*\\}",
+      "excludeTests": true
+    },
+    {
+      "id": "AP-FRM-05",
+      "title": "Template form without validators",
+      "severity": "minor",
+      "category": "FRM",
+      "detection": "absence",
+      "principles": [
+        "P-08"
+      ],
+      "doc": "frm.md#ap-frm-05",
+      "why": "A RadzenTemplateForm without validators submits invalid input and shows no field messages.",
+      "fix": "Add Radzen validators or the DataAnnotations validator used by the repository.",
+      "files": [
+        "*.razor"
+      ],
+      "pattern": "<RadzenTemplateForm\\b",
+      "requires": "Validator\\b"
+    },
+    {
+      "id": "AP-DAT-01",
+      "title": "Materialize, then query",
+      "severity": "major",
+      "category": "DAT",
+      "detection": "regex",
+      "principles": [
+        "P-10"
+      ],
+      "doc": "dat.md#ap-dat-01",
+      "why": "Calling ToList() before Where/Skip/Take/OrderBy/Count loads the whole table into memory.",
+      "fix": "Compose the query on IQueryable and materialize last.",
+      "bad": "db.Customers.ToList().Where(c => c.City == city).Skip(skip)",
+      "good": "db.Customers.Where(c => c.City == city).Skip(skip).Take(take).ToListAsync(ct)",
+      "files": [
+        "*.razor",
+        "*.cs"
+      ],
+      "pattern": "\\.ToList(Async)?\\s*\\(\\s*[^()]*\\)\\s*\\)?\\s*\\.\\s*(Where|Skip|Take|OrderBy|OrderByDescending|Count|Any)\\s*\\(",
+      "excludeTests": true
+    },
+    {
+      "id": "AP-DAT-02",
+      "title": "Loading everything in a component",
+      "severity": "major",
+      "category": "DAT",
+      "detection": "regex",
+      "principles": [
+        "P-10"
+      ],
+      "doc": "dat.md#ap-dat-02",
+      "why": "GetAll-style calls from components assume a small dataset.",
+      "fix": "Use a paged/filtered query; if the set is bounded, waive with the bound.",
+      "files": [
+        "*.razor"
+      ],
+      "pattern": "await\\s+[\\w.]+\\.(GetAll|ListAll|LoadAll)\\w*\\s*\\("
+    },
+    {
+      "id": "AP-DAT-03",
+      "title": "Client-side aggregation of large data",
+      "severity": "major",
+      "category": "DAT",
+      "detection": "manual-review",
+      "principles": [
+        "P-10"
+      ],
+      "doc": "dat.md#ap-dat-03",
+      "why": "Summing or grouping raw rows in the browser for dashboards is slow and leaks detail data.",
+      "fix": "Aggregate on the server and return only the metrics."
+    },
+    {
+      "id": "AP-PERF-01",
+      "title": "Async call per row in a template",
+      "severity": "major",
+      "category": "PERF",
+      "detection": "regex",
+      "principles": [
+        "P-10"
+      ],
+      "doc": "perf.md#ap-perf-01",
+      "why": "Awaiting a service call inside a column or row template runs once per row per render (N+1).",
+      "fix": "Load the required data with the page query (projection) or in one batch call.",
+      "files": [
+        "*.razor"
+      ],
+      "pattern": "<(Template|EditTemplate|RowTemplate)\\b[^>]*>(?:(?!</(Template|EditTemplate|RowTemplate)>)[\\s\\S]){0,600}?@\\(?\\s*await\\b"
+    },
+    {
+      "id": "AP-PERF-02",
+      "title": "Search on every keystroke without debounce",
+      "severity": "minor",
+      "category": "PERF",
+      "detection": "regex",
+      "principles": [
+        "P-10"
+      ],
+      "doc": "perf.md#ap-perf-02",
+      "why": "Calling the server on each input event floods the backend and returns results out of order.",
+      "fix": "Debounce (e.g. Radzen FilterDelay / a timer) and cancel the previous request.",
+      "files": [
+        "*.razor"
+      ],
+      "pattern": "@oninput\\s*=\\s*\"[^\"]*(Search|Filter|Load)\\w*\""
+    },
+    {
+      "id": "AP-PERF-03",
+      "title": "new HttpClient()",
+      "severity": "major",
+      "category": "PERF",
+      "detection": "regex",
+      "principles": [
+        "P-02",
+        "P-10"
+      ],
+      "doc": "perf.md#ap-perf-03",
+      "why": "Creating HttpClient per call exhausts sockets and bypasses configured handlers (auth, resilience).",
+      "fix": "Inject a typed client / IHttpClientFactory as the repository does.",
+      "files": [
+        "*.razor",
+        "*.cs"
+      ],
+      "pattern": "new\\s+HttpClient\\s*\\(",
+      "excludeTests": true
+    },
+    {
+      "id": "AP-A11Y-01",
+      "title": "Icon-only button without accessible name",
+      "severity": "major",
+      "category": "A11Y",
+      "detection": "regex",
+      "principles": [
+        "P-09"
+      ],
+      "doc": "a11y.md#ap-a11y-01",
+      "why": "Screen readers announce an unlabeled button as \"button\".",
+      "fix": "Add Text, or title plus aria-label.",
+      "bad": "<RadzenButton Icon=\"delete\" Click=\"@Delete\" />",
+      "good": "<RadzenButton Icon=\"delete\" title=\"Delete customer\" aria-label=\"Delete customer\" Click=\"@Delete\" />",
+      "mcpQuery": "Radzen Blazor RadzenButton accessibility aria-label icon only",
+      "files": [
+        "*.razor"
+      ],
+      "pattern": "<RadzenButton\\b(?=[^>]*\\bIcon\\s*=)(?![^>]*\\b(Text|title|aria-label|AriaLabel)\\s*=)[^>]*/>"
+    },
+    {
+      "id": "AP-A11Y-02",
+      "title": "Colour as the only signal",
+      "severity": "minor",
+      "category": "A11Y",
+      "detection": "manual-review",
+      "principles": [
+        "P-09"
+      ],
+      "doc": "a11y.md#ap-a11y-02",
+      "why": "Status shown only by colour is invisible to colour-blind users.",
+      "fix": "Add text or an icon with a label."
+    },
+    {
+      "id": "AP-A11Y-03",
+      "title": "Image without alt text",
+      "severity": "minor",
+      "category": "A11Y",
+      "detection": "regex",
+      "principles": [
+        "P-09"
+      ],
+      "doc": "a11y.md#ap-a11y-03",
+      "why": "Images without alt are announced by file name or skipped without context.",
+      "fix": "Add alt (empty alt=\"\" for decorative images).",
+      "files": [
+        "*.razor",
+        "*.cshtml",
+        "*.html"
+      ],
+      "pattern": "<img\\b(?![^>]*\\balt\\s*=)[^>]*>"
+    },
+    {
+      "id": "AP-A11Y-04",
+      "title": "Input without label",
+      "severity": "major",
+      "category": "A11Y",
+      "detection": "manual-review",
+      "principles": [
+        "P-09"
+      ],
+      "doc": "a11y.md#ap-a11y-04",
+      "why": "Inputs need a programmatic label (RadzenFormField Text, RadzenLabel Component, or aria-label).",
+      "fix": "Wrap inputs in RadzenFormField or associate a RadzenLabel."
+    },
+    {
+      "id": "AP-A11Y-05",
+      "title": "Positive tabindex",
+      "severity": "minor",
+      "category": "A11Y",
+      "detection": "regex",
+      "principles": [
+        "P-09"
+      ],
+      "doc": "a11y.md#ap-a11y-05",
+      "why": "Positive tabindex breaks the natural focus order.",
+      "fix": "Use DOM order; tabindex 0 or -1 only.",
+      "files": [
+        "*.razor",
+        "*.html"
+      ],
+      "pattern": "tabindex\\s*=\\s*\"?[1-9]"
+    },
+    {
+      "id": "AP-RSP-01",
+      "title": "Large fixed pixel column widths",
+      "severity": "minor",
+      "category": "RSP",
+      "detection": "regex",
+      "principles": [
+        "P-09"
+      ],
+      "doc": "rsp.md#ap-rsp-01",
+      "why": "Fixed widths of hundreds of pixels force horizontal scrolling on small screens.",
+      "fix": "Give priority columns flexible widths; hide or collapse secondary columns at small breakpoints.",
+      "files": [
+        "*.razor"
+      ],
+      "pattern": "<RadzenDataGridColumn\\b[^>]*\\bWidth\\s*=\\s*\"[3-9]\\d{2,}px\""
+    },
+    {
+      "id": "AP-RSP-02",
+      "title": "Side-by-side master-detail on narrow screens",
+      "severity": "major",
+      "category": "RSP",
+      "detection": "manual-review",
+      "principles": [
+        "P-09"
+      ],
+      "doc": "rsp.md#ap-rsp-02",
+      "why": "Two grids next to each other are unusable on mobile.",
+      "fix": "Stack or navigate between master and detail at small breakpoints."
+    },
+    {
+      "id": "AP-RSP-03",
+      "title": "Dialog with large fixed width",
+      "severity": "minor",
+      "category": "RSP",
+      "detection": "regex",
+      "principles": [
+        "P-09"
+      ],
+      "doc": "rsp.md#ap-rsp-03",
+      "why": "Fixed-width dialogs overflow small viewports.",
+      "fix": "Use relative widths or max-width, following the repository dialog options.",
+      "files": [
+        "*.razor",
+        "*.cs"
+      ],
+      "pattern": "Width\\s*=\\s*\"[6-9]\\d{2}px\"|Width\\s*=\\s*\"\\d{4,}px\"",
+      "requires": "DialogOptions|OpenAsync|OpenSideAsync"
+    },
+    {
+      "id": "AP-RSP-04",
+      "title": "Very large fixed inline width",
+      "severity": "minor",
+      "category": "RSP",
+      "detection": "regex",
+      "principles": [
+        "P-09"
+      ],
+      "doc": "rsp.md#ap-rsp-04",
+      "why": "Inline widths over 1000px break layouts on anything but wide desktops.",
+      "fix": "Use layout components (RadzenRow/Column, RadzenStack) and relative units.",
+      "files": [
+        "*.razor"
+      ],
+      "pattern": "style\\s*=\\s*\"[^\"]*\\bwidth\\s*:\\s*\\d{4,}px"
+    },
+    {
+      "id": "AP-ARC-01",
+      "title": "Unapproved dependency",
+      "severity": "major",
+      "category": "ARC",
+      "detection": "tool",
+      "principles": [
+        "P-02",
+        "P-04"
+      ],
+      "doc": "arc.md#ap-arc-01",
+      "why": "New packages, projects or framework references change the architecture and supply chain.",
+      "fix": "List the change under \"Approved dependency changes\" in plan.md, or remove it.",
+      "message": "Checked by G7.",
+      "tool": "G7 package/project drift check"
+    },
+    {
+      "id": "AP-ARC-02",
+      "title": "Wrapper without stable value",
+      "severity": "minor",
+      "category": "ARC",
+      "detection": "manual-review",
+      "principles": [
+        "P-02",
+        "P-05"
+      ],
+      "doc": "arc.md#ap-arc-02",
+      "why": "A thin wrapper around one Radzen component adds indirection without behaviour.",
+      "fix": "Use the Radzen component directly unless the wrapper enforces a repository convention."
+    },
+    {
+      "id": "AP-ARC-03",
+      "title": "Unrelated refactoring inside a slice",
+      "severity": "major",
+      "category": "ARC",
+      "detection": "manual-review",
+      "principles": [
+        "P-11"
+      ],
+      "doc": "arc.md#ap-arc-03",
+      "why": "Mixed changes are hard to review and roll back.",
+      "fix": "Keep the slice to its tasks; record other findings as out-of-scope."
+    },
+    {
+      "id": "AP-ARC-04",
+      "title": "Repairing brownfield inconsistencies during feature work",
+      "severity": "minor",
+      "category": "ARC",
+      "detection": "manual-review",
+      "principles": [
+        "P-02",
+        "P-11"
+      ],
+      "doc": "arc.md#ap-arc-04",
+      "why": "Fixing unrelated architecture during a feature expands scope silently.",
+      "fix": "Record under out-of-scope findings in discovery.md."
+    },
+    {
+      "id": "AP-ARC-05",
+      "title": "Data access from components",
+      "severity": "major",
+      "category": "ARC",
+      "detection": "regex",
+      "principles": [
+        "P-06",
+        "P-02"
+      ],
+      "doc": "arc.md#ap-arc-05",
+      "why": "Injecting a DbContext into UI bypasses the application/service layer, validation and authorization.",
+      "fix": "Call the service/client used by the analogous feature. If the repository deliberately uses DbContext in components, waive with that evidence.",
+      "files": [
+        "*.razor",
+        "*.cs"
+      ],
+      "pattern": "@inject\\s+(IDbContextFactory<\\w+>|\\w*DbContext)\\b|\\[Inject\\][^\\n]*\\b(IDbContextFactory<\\w+>|\\w*DbContext)\\b"
+    },
+    {
+      "id": "AP-ARC-06",
+      "title": "Global state for local state",
+      "severity": "minor",
+      "category": "ARC",
+      "detection": "manual-review",
+      "principles": [
+        "P-02"
+      ],
+      "doc": "arc.md#ap-arc-06",
+      "why": "Introducing a store for state that belongs to one component adds complexity.",
+      "fix": "Keep local state in the component or follow the repository state pattern."
+    },
+    {
+      "id": "AP-TST-01",
+      "title": "Skipped or ignored tests",
+      "severity": "major",
+      "category": "TST",
+      "detection": "regex",
+      "principles": [
+        "P-12"
+      ],
+      "doc": "tst.md#ap-tst-01",
+      "why": "Skipping tests to make a gate pass hides regressions.",
+      "fix": "Fix the test or the code; if a skip is legitimate and pre-existing, waive with the issue link.",
+      "files": [
+        "*.cs"
+      ],
+      "pattern": "\\[(Fact|Theory|Test|TestMethod)\\s*\\([^)]*\\bSkip\\s*=|\\[Ignore\\b|\\[Skip\\b"
+    },
+    {
+      "id": "AP-TST-02",
+      "title": "Brittle markup snapshots",
+      "severity": "minor",
+      "category": "TST",
+      "detection": "manual-review",
+      "principles": [
+        "P-12"
+      ],
+      "doc": "tst.md#ap-tst-02",
+      "why": "Snapshotting full Radzen markup breaks on every Radzen upgrade.",
+      "fix": "Assert behaviour (text, state, callbacks) unless snapshots are the repository convention."
+    },
+    {
+      "id": "AP-TST-03",
+      "title": "Deleted tests",
+      "severity": "blocker",
+      "category": "TST",
+      "detection": "tool",
+      "principles": [
+        "P-12"
+      ],
+      "doc": "tst.md#ap-tst-03",
+      "why": "Removing tests in a feature change hides regressions.",
+      "fix": "Restore them or record an approved reason.",
+      "message": "Test file deleted in this change: {0}",
+      "tool": "scanner: git diff deleted *Test*.cs files"
+    },
+    {
+      "id": "AP-AGT-01",
+      "title": "Skipping discovery",
+      "severity": "major",
+      "category": "AGT",
+      "detection": "tool",
+      "principles": [
+        "P-01"
+      ],
+      "doc": "agt.md#ap-agt-01",
+      "why": "Designing without the repository model produces foreign architecture.",
+      "fix": "Run phase 01; G1 must pass before specify.",
+      "tool": "phase guard (G1)"
+    },
+    {
+      "id": "AP-AGT-02",
+      "title": "Changing package versions to fix compile errors",
+      "severity": "blocker",
+      "category": "AGT",
+      "detection": "tool",
+      "principles": [
+        "P-04",
+        "P-03"
+      ],
+      "doc": "agt.md#ap-agt-02",
+      "why": "Upgrading Radzen.Blazor to make MCP guidance compile changes scope and risk.",
+      "fix": "Follow the fallback matrix; propose upgrades as separate scope.",
+      "tool": "G7 package drift check"
+    },
+    {
+      "id": "AP-AGT-03",
+      "title": "Suppressing warnings or analyzers",
+      "severity": "major",
+      "category": "AGT",
+      "detection": "regex",
+      "principles": [
+        "P-12"
+      ],
+      "doc": "agt.md#ap-agt-03",
+      "why": "Suppressions hide the problems gates are meant to find.",
+      "fix": "Fix the warning. Pre-existing suppressions are fine; new ones need a waiver with reason.",
+      "files": [
+        "*.razor",
+        "*.cs",
+        "*.csproj",
+        "*.props",
+        ".editorconfig"
+      ],
+      "pattern": "#pragma\\s+warning\\s+disable|<TreatWarningsAsErrors>\\s*false|\\[SuppressMessage\\(|<NoWarn>|dotnet_diagnostic\\.\\w+\\.severity\\s*=\\s*none"
+    },
+    {
+      "id": "AP-AGT-04",
+      "title": "Claiming a gate passed without evidence",
+      "severity": "blocker",
+      "category": "AGT",
+      "detection": "tool",
+      "principles": [
+        "P-12"
+      ],
+      "doc": "agt.md#ap-agt-04",
+      "why": "Unverified claims make gate reports meaningless.",
+      "fix": "Report only what specs/NNN/gates/G#.json says.",
+      "tool": "G8 re-validation"
+    },
+    {
+      "id": "AP-AGT-05",
+      "title": "Inventing facts",
+      "severity": "blocker",
+      "category": "AGT",
+      "detection": "manual-review",
+      "principles": [
+        "P-14"
+      ],
+      "doc": "agt.md#ap-agt-05",
+      "why": "Unknown facts written as known mislead later phases.",
+      "fix": "Mark unknown; cite evidence for every fact."
+    },
+    {
+      "id": "AP-AGT-06",
+      "title": "Asking trivial clarification questions",
+      "severity": "minor",
+      "category": "AGT",
+      "detection": "manual-review",
+      "principles": [
+        "P-01"
+      ],
+      "doc": "agt.md#ap-agt-06",
+      "why": "Questions the repository already answers waste the user’s time.",
+      "fix": "Decide by convention and record the evidence."
+    },
+    {
+      "id": "AP-AGT-07",
+      "title": "Unrecorded MCP knowledge",
+      "severity": "major",
+      "category": "AGT",
+      "detection": "tool",
+      "principles": [
+        "P-15"
+      ],
+      "doc": "agt.md#ap-agt-07",
+      "why": "Knowledge used without an evidence entry cannot be reviewed or re-verified.",
+      "fix": "Record every answer that informs code with speckit-radzen evidence add.",
+      "tool": "G4 evidence check"
+    },
+    {
+      "id": "AP-AGT-08",
+      "title": "Waiver without reason",
+      "severity": "major",
+      "category": "AGT",
+      "detection": "tool",
+      "principles": [
+        "P-12"
+      ],
+      "doc": "agt.md#ap-agt-08",
+      "why": "A waiver without a reason cannot be reviewed; it turns a finding into silence.",
+      "fix": "Add reason=\"…\" (what makes this acceptable, and who approved it).",
+      "bad": "@* speckit-radzen:ignore AP-RDZ-02 *@",
+      "good": "@* speckit-radzen:ignore AP-RDZ-02 reason=\"lookup table, max 12 rows\" *@",
+      "tool": "scanner: waiver syntax check",
+      "message": "Waiver without reason."
+    }
+  ]
+}

@@ -1,16 +1,11 @@
 # Radzen MCP Standard
 
-Use Radzen Blazor MCP for current component selection, properties, events, callbacks, enums, binding, services, templates, and supported patterns.
+Summary of the MCP-first rules. The full workflow is in `../mcp/`.
 
-Queries should be narrow and include exact component names when known, relevant data shape, required interaction, and compatibility context when needed.
-
-Verification precedence:
-1. installed package/compiler;
-2. proven project-local usage;
-3. current Radzen MCP guidance;
-4. authoritative Radzen documentation;
-5. generic model knowledge.
-
-Radzen Blazor Studio MCP may scaffold/edit when applicable, but its output remains subject to repository architecture, approved scope, build/test gates, security, and review.
-
-Never commit MCP license keys or secrets.
+- Use the Radzen Blazor MCP (`search`) for component selection, properties, events, callbacks, enums, binding, services, templates and supported patterns — before writing code (`../mcp/mcp-workflow.md`).
+- Query narrowly: exact component names, data shape, required interaction, installed version (`../mcp/query-playbook.md`).
+- Record every answer that informs code as `MCP-###` evidence (`speckit-radzen evidence add`).
+- Verification precedence: installed package/compiler → project-local usage → Radzen MCP → official docs → model knowledge (never sufficient alone).
+- Conflicts and unavailability: `../mcp/fallback-matrix.md`.
+- Radzen Blazor Studio MCP may scaffold or edit only within approved scope (`../mcp/studio-guardrails.md`).
+- Never commit MCP licence keys (ADR-0005).

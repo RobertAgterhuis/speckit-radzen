@@ -1,0 +1,10 @@
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanShop.Domain", "src\\CleanShop.Domain\\CleanShop.Domain.csproj", "{0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanShop.Application", "src\\CleanShop.Application\\CleanShop.Application.csproj", "{1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanShop.Infrastructure", "src\\CleanShop.Infrastructure\\CleanShop.Infrastructure.csproj", "{2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanShop.Web", "src\\CleanShop.Web\\CleanShop.Web.csproj", "{3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CleanShop.Tests", "tests\\CleanShop.Tests\\CleanShop.Tests.csproj", "{9}"
+EndProject

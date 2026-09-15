@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Quality gate result",
+  "type": "object",
+  "required": ["schemaVersion", "gate", "feature", "status", "exitCode", "startedAt", "finishedAt", "kitVersion", "checks"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "gate": { "type": "string", "pattern": "^G[0-8]$" },
+    "name": { "type": "string" },
+    "feature": { "type": "string" },
+    "slice": { "type": ["string", "null"] },
+    "status": { "enum": ["pass", "fail", "waived", "error"] },
+    "exitCode": { "enum": [0, 1, 2, 3] },
+    "startedAt": { "type": "string" },
+    "finishedAt": { "type": "string" },
+    "kitVersion": { "type": "string" },
+    "codeFingerprint": { "type": ["string", "null"] },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["check", "status"],
+        "properties": {
+          "check": { "type": "string" },
+          "status": { "enum": ["pass", "fail", "waived", "error", "skipped", "manual"] },
+          "message": { "type": "string" },
+          "evidence": { "type": "array" }
+        }
+      }
+    }
+  }
+}

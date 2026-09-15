@@ -1,0 +1,4 @@
+@page "/cart"
+@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))
+<RadzenDataGrid TItem="string" Data="@items" />
+@code { string[] items = []; }

@@ -1,0 +1,10 @@
+## Spec Kit Radzen
+
+For Radzen Blazor feature work, follow the Spec Kit Radzen operating contract: `.speckit/radzen/core/agents/operating-contract.md` (skill `speckit-radzen`).
+
+- Run `pwsh .speckit/radzen/tools/speckit-radzen.ps1 status` to see the current feature and the next step.
+- Detect the project first (`detect`); follow the analogous feature; never add unapproved dependencies.
+- Verify every Radzen API through the Radzen Blazor MCP and record it (`evidence add`); never invent Radzen members.
+- Move through phases with `phase`; pass gates with `gate G0`…`G8`; quote gate results, never assume them.
+- Hidden/disabled UI is not authorization. No secrets in tracked files (the MCP key comes from `RADZEN_MCP_KEY`).
+- Stop and ask on ambiguous authorization, unverifiable APIs, unapproved scope or dependency changes, or gate exit code 3.

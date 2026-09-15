@@ -1,0 +1,12 @@
+@page "/users"
+@inject DialogService Dialogs
+@inject HttpClient Http
+<AuthorizeView Roles="Admin">
+    <RadzenButton Text="Delete" Click="@Delete" />
+</AuthorizeView>
+<RadzenDataGrid TItem="UserDto" Data="@users" />
+@code {
+    List<UserDto> users = new();
+    protected override async Task OnInitializedAsync() => users = (await Http.GetFromJsonAsync<List<UserDto>>("api/users"))!.ToList();
+    async void Delete() => await Dialogs.Confirm("Sure?");
+}

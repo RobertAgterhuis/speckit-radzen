@@ -1,0 +1,61 @@
+# Spec Kit Radzen gates for pull requests.
+# Copy to .github/workflows/ in your repository. Branches named feature/NNN-* (or NNN-*) are mapped to specs/NNN-*.
+name: speckit-radzen gates
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Resolve feature
+        id: feature
+        shell: pwsh
+        run: |
+          $branch = '${{ github.head_ref }}'
+          if ($branch -match '(^|/)(\d{3})-') { "number=$($Matches[2])" >> $env:GITHUB_OUTPUT }
+          else { Write-Host "Branch '$branch' is not a feature branch; skipping gates."; "number=" >> $env:GITHUB_OUTPUT }
+
+      - name: Verify install and profile
+        if: steps.feature.outputs.number != ''
+        shell: pwsh
+        run: |
+          $cli = './.speckit/radzen/tools/speckit-radzen.ps1'
+          & $cli verify-install
+          & $cli detect
+
+      - name: G6 anti-pattern scan
+        if: steps.feature.outputs.number != ''
+        shell: pwsh
+        run: ./.speckit/radzen/tools/speckit-radzen.ps1 gate G6 -Feature ${{ steps.feature.outputs.number }}
+
+      - name: G5 build and test
+        if: steps.feature.outputs.number != ''
+        shell: pwsh
+        run: ./.speckit/radzen/tools/speckit-radzen.ps1 gate G5 -Feature ${{ steps.feature.outputs.number }}
+
+      - name: G8 done (only when the feature claims to be done)
+        if: steps.feature.outputs.number != ''
+        shell: pwsh
+        run: |
+          $state = Get-ChildItem specs -Directory -Filter '${{ steps.feature.outputs.number }}-*' | Select-Object -First 1 | ForEach-Object { Get-Content (Join-Path $_ 'state.json') -Raw | ConvertFrom-Json }
+          if ($state.phase -in 'review', 'done') { ./.speckit/radzen/tools/speckit-radzen.ps1 gate G8 -Feature ${{ steps.feature.outputs.number }} }
+
+      - name: Upload SARIF
+        if: always() && steps.feature.outputs.number != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: speckit-radzen-gates
+          path: specs/${{ steps.feature.outputs.number }}-*/gates/

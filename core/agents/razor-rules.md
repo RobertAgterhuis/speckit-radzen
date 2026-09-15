@@ -1,0 +1,15 @@
+# Radzen Razor Rules (path-scoped)
+
+Apply to `*.razor`, `*.razor.cs` and `*.razor.css` files.
+
+- Every Radzen component, parameter, event or service you use must have `MCP-###` evidence in the active feature (`specs/NNN-*/mcp-evidence.md`). If it has none, query the Radzen Blazor MCP first and record it (`speckit-radzen evidence add`). Do not invent members.
+- Match the render mode of the analogous page; interactive Radzen components do not work on static SSR pages.
+- Unbounded collections: `RadzenDataGrid` with `LoadData` + `Count` + `IsLoading`; never forward `LoadDataArgs.Filter` to a server query.
+- `DialogService.OpenAsync` returns null on dismiss — pattern-match the result.
+- Return `Task` from event handlers (no `async void`); never block on `.Result`/`.Wait()`.
+- Bind forms to view models, not persistence entities; add validators; disable submit while busy.
+- Icon-only buttons need `title` and `aria-label`; inputs need labels (`RadzenFormField`).
+- Hidden/disabled UI is not authorization — enforce on the server.
+- No exception messages in notifications; no `MarkupString` for user content; no `DbContext` in components.
+- Waive a scanner finding only with a reason: `@* speckit-radzen:ignore AP-XXX-00 reason="…" *@`.
+- After changes: `speckit-radzen gate G5 -Slice S-##` and `speckit-radzen gate G6`.

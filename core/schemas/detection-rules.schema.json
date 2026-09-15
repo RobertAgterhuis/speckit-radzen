@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Detection rules",
+  "type": "object",
+  "required": ["schemaVersion", "rules"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "fact", "value", "kind", "pattern", "confidence"],
+        "properties": {
+          "id": { "type": "string" },
+          "fact": { "type": "string", "pattern": "^(runtime|blazor|radzen|architecture|security|testing)\\.[A-Za-z0-9]+$" },
+          "value": { "type": "string" },
+          "kind": { "enum": ["package", "file", "content"] },
+          "pattern": { "type": "string" },
+          "files": { "type": "array", "items": { "type": "string" } },
+          "confidence": { "enum": ["proven", "inferred"] },
+          "multi": { "type": "boolean" }
+        }
+      }
+    }
+  }
+}

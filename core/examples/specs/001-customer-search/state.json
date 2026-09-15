@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "feature": "001-customer-search",
+  "number": "001",
+  "name": "Customer search",
+  "phase": "review",
+  "created": "2026-09-15T12:00:00Z",
+  "updated": "2026-09-15T13:00:00Z",
+  "baseRef": null,
+  "mcp": {
+    "availability": "available",
+    "recordedAt": "2026-09-15T12:01:00Z",
+    "note": null
+  },
+  "gates": {
+    "G0": {
+      "status": "pass",
+      "at": "2026-09-15T12:30:00Z",
+      "slice": null,
+      "codeFingerprint": null
+    },
+    "G1": {
+      "status": "pass",
+      "at": "2026-09-15T12:30:00Z",
+      "slice": null,
+      "codeFingerprint": null
+    },
+    "G2": {
+      "status": "pass",
+      "at": "2026-09-15T12:30:00Z",
+      "slice": null,
+      "codeFingerprint": null
+    },
+    "G3": {
+      "status": "pass",
+      "at": "2026-09-15T12:30:00Z",
+      "slice": null,
+      "codeFingerprint": null
+    },
+    "G4": {
+      "status": "pass",
+      "at": "2026-09-15T12:30:00Z",
+      "slice": null,
+      "codeFingerprint": null
+    }
+  },
+  "slices": {
+    "S-01": {
+      "status": "done",
+      "at": "2026-09-15T12:45:00Z",
+      "g5": "pass",
+      "g6": "pass"
+    },
+    "S-02": {
+      "status": "done",
+      "at": "2026-09-15T12:55:00Z",
+      "g5": "pass",
+      "g6": "pass"
+    }
+  },
+  "history": [
+    {
+      "at": "2026-09-15T12:00:00Z",
+      "event": "created",
+      "detail": "Customer search"
+    }
+  ]
+}

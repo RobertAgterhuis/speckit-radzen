@@ -1,0 +1,10 @@
+# Spec Artifact Rules (path-scoped)
+
+Apply to files under `specs/`.
+
+- Keep the template headings; the linter depends on them. Replace every `{{placeholder}}`.
+- IDs: `US-###`, `FR-###`, `NFR-###`, `AC-###` (with `(FR-###)`), `Q-###`, `S-##`, `T-###`, `TS-###`, `MCP-###`.
+- Every FR has an AC; every AC has a test scenario; every FR is covered by a slice and a task.
+- Mark open questions inline as `[NEEDS CLARIFICATION: Q-### …]`; G2 fails while any remain.
+- Never edit `state.json`, `mcp-evidence.*`, `analysis.md`, `gate-report.md` or `gates/*` by hand — use `speckit-radzen` commands.
+- Run `speckit-radzen lint -Feature NNN` after editing.

@@ -1,0 +1,11 @@
+@typeparam TItem
+<RadzenDataGrid TItem="TItem" Data="@Data" Count="@Count" LoadData="@LoadData" AllowPaging="true" PageSize="25">
+    <Columns>@Columns</Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter] public IEnumerable<TItem>? Data { get; set; }
+    [Parameter] public int Count { get; set; }
+    [Parameter] public EventCallback<Radzen.LoadDataArgs> LoadData { get; set; }
+    [Parameter] public RenderFragment? Columns { get; set; }
+}

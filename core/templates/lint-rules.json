@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "artifacts": {
+    "discovery": {
+      "file": "discovery.md",
+      "requiredSections": ["Request", "Repository summary", "Analogous feature", "Feature dependency trace", "Scope classification", "Unknowns", "Blocking", "Non-blocking"]
+    },
+    "spec": {
+      "file": "spec.md",
+      "requiredSections": ["Problem", "Actors", "User stories", "Functional requirements", "Acceptance criteria", "Authorization matrix", "Data requirements", "Data volume", "UI states", "Non-goals", "Assumptions", "Open questions"]
+    },
+    "gap-analysis": {
+      "file": "gap-analysis.md",
+      "requiredSections": ["Architecture impact", "Material unknowns", "Out-of-scope findings"]
+    },
+    "clarifications": {
+      "file": "clarifications.md",
+      "requiredSections": []
+    },
+    "plan": {
+      "file": "plan.md",
+      "requiredSections": ["Context", "Constitution check", "Layer impact", "Approved dependency changes", "Component strategy", "Radzen MCP verification", "Render mode", "Security model", "Data flow", "UI states", "Responsive and accessibility strategy", "Testing strategy", "Vertical slices", "Risks", "Explicit non-goals"]
+    },
+    "test-scenarios": {
+      "file": "test-scenarios.md",
+      "requiredSections": ["State coverage"]
+    },
+    "tasks": {
+      "file": "tasks.md",
+      "requiredSections": []
+    },
+    "review": {
+      "file": "review.md",
+      "requiredSections": ["Acceptance criteria", "Checklists", "Security", "UI states", "Responsive and accessibility", "Radzen usage", "Architecture", "Manual-review anti-patterns", "Findings", "Definition of Done"]
+    }
+  }
+}

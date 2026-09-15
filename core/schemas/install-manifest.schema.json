@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Install manifest",
+  "type": "object",
+  "required": ["schemaVersion", "kitVersion", "installedAt", "updatedAt", "agents", "files", "managedBlocks"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "kitVersion": { "type": "string" },
+    "installedAt": { "type": "string" },
+    "updatedAt": { "type": "string" },
+    "agents": { "type": "array", "items": { "enum": ["claude", "copilot", "codex", "cursor", "generic"] } },
+    "mcpClients": { "type": "array", "items": { "type": "string" } },
+    "files": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["sha256", "owner"],
+        "properties": { "sha256": { "type": "string" }, "owner": { "type": "string" } }
+      }
+    },
+    "managedBlocks": { "type": "array", "items": { "type": "string" } }
+  }
+}

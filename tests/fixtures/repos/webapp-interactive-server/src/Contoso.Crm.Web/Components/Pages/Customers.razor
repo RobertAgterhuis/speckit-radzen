@@ -1,0 +1,25 @@
+@page "/customers"
+@attribute [Authorize(Policy = "CustomersRead")]
+@inject DialogService DialogService
+@inject ICustomerService Customers
+
+<RadzenDataGrid TItem="CustomerSummary" Data="@items" Count="@count" LoadData="@LoadData" IsLoading="@loading" AllowPaging="true">
+    <Columns>
+        <RadzenDataGridColumn Property="Name" Title="Name" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    IEnumerable<CustomerSummary> items = [];
+    int count;
+    bool loading;
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        loading = true;
+        var page = await Customers.GetPageAsync(args.Skip ?? 0, args.Top ?? 20);
+        items = page.Items;
+        count = page.Total;
+        loading = false;
+    }
+}

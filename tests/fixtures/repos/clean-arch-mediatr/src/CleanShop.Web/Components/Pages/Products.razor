@@ -1,0 +1,7 @@
+@page "/products"
+@inject IMediator Mediator
+<RadzenTemplateForm TItem="ProductModel" Data="@model" Submit="@Save">
+    <RadzenTextBox Name="Name" @bind-Value="model.Name" />
+    <RadzenRequiredValidator Component="Name" Text="Name is required" />
+</RadzenTemplateForm>
+@code { ProductModel model = new(); async Task Save(ProductModel m) => await Mediator.Send(new SaveProduct(m)); }
