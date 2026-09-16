@@ -17,9 +17,9 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
 
@@ -33,7 +33,9 @@ jobs:
       - name: Static analysis (PSScriptAnalyzer)
         shell: pwsh
         run: |
-          $results = Invoke-ScriptAnalyzer -Path tools, build, install -Recurse -Settings ./PSScriptAnalyzerSettings.psd1
+          $results = foreach ($p in 'tools', 'build', 'install') {
+            Invoke-ScriptAnalyzer -Path $p -Recurse -Settings ./PSScriptAnalyzerSettings.psd1
+          }
           $results | Format-Table -AutoSize
           if ($results | Where-Object Severity -eq 'Error') { throw 'PSScriptAnalyzer errors found.' }
 
@@ -51,7 +53,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-results-${{ matrix.os }}
           path: tests/results/
@@ -60,7 +62,7 @@ jobs:
     name: bash bootstrap (bash 3.2 compatible)
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Syntax check with system bash
         run: /bin/bash -n install/install.sh
       - name: Install into a temp repo
@@ -72,23 +74,22 @@ jobs:
   markdown:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: DavidAnson/markdownlint-cli2-action@v16
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          globs: |
-            **/*.md
-            !tests/fixtures/**
-            !integrations/**
+          node-version: '24'
+      - name: markdownlint
+        run: npx --yes markdownlint-cli2@0.22.1 "**/*.md" "!tests/fixtures/**" "!integrations/**"
 
   package:
     needs: [test, bash-bootstrap, markdown]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Build distribution
         shell: pwsh
         run: ./build/Build-Package.ps1
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: speckit-radzen-dist
           path: dist/
