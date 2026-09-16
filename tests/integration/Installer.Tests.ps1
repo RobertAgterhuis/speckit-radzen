@@ -84,13 +84,15 @@ Describe 'Installer lifecycle' {
 
     It 'rolls back completely when a write fails' {
         Set-Content (Join-Path $repo 'AGENTS.md') 'original'
+        $originalBytes = [System.IO.File]::ReadAllBytes((Join-Path $repo 'AGENTS.md'))
         $before = @(Get-ChildItem $repo -Recurse -Force -File | Where-Object FullName -notmatch '[\\/]\.git[\\/]' | ForEach-Object FullName | Sort-Object)
         $env:SKR_INSTALL_FAIL_AFTER = '40'
         { Install-SpecKitRadzen -Repository $repo -Agents codex -Yes } | Should -Throw '*rolled back*'
         $env:SKR_INSTALL_FAIL_AFTER = $null
         $after = @(Get-ChildItem $repo -Recurse -Force -File | Where-Object FullName -notmatch '[\\/]\.git[\\/]' | ForEach-Object FullName | Sort-Object)
         $after | Should -Be $before
-        Get-Content (Join-Path $repo 'AGENTS.md') -Raw | Should -Be "original`n"
+        # Set-Content writes the platform newline; rollback must restore the exact bytes.
+        [System.IO.File]::ReadAllBytes((Join-Path $repo 'AGENTS.md')) | Should -Be $originalBytes
         Join-Path $repo '.speckit' | Should -Not -Exist
     }
 
@@ -119,9 +121,11 @@ Describe 'Installer lifecycle' {
 
     It 'keeps .speckit/radzen/local untouched across update and uninstall' {
         $null = Install-SpecKitRadzen -Repository $repo -Agents generic -Yes
-        Set-Content (Join-Path $repo '.speckit/radzen/local/constitution.local.md') '# local'
+        $local = Join-Path $repo '.speckit/radzen/local/constitution.local.md'
+        Set-Content $local '# local'
+        $localBytes = [System.IO.File]::ReadAllBytes($local)
         $null = Update-SpecKitRadzen -Repository $repo -Force
-        Get-Content (Join-Path $repo '.speckit/radzen/local/constitution.local.md') -Raw | Should -Be "# local`n"
+        [System.IO.File]::ReadAllBytes($local) | Should -Be $localBytes
         $null = Uninstall-SpecKitRadzen -Repository $repo
         Join-Path $repo '.speckit/radzen/local/constitution.local.md' | Should -Exist
     }

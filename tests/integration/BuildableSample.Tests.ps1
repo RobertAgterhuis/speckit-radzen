@@ -35,7 +35,9 @@ Describe 'Worked example on buildable-sample' -Tag 'Build' -Skip:(-not $script:E
     }
 
     It 'has a green baseline with tests' {
-        $baseline.BuildSucceeded | Should -BeTrue
+        $recorded = Get-Content $baseline.Path -Raw | ConvertFrom-Json
+        $why = (@($recorded.errors) | ForEach-Object { "$($_.file)($($_.line)): $($_.code) $($_.message)" }) -join ' | '
+        $baseline.BuildSucceeded | Should -BeTrue -Because "the sample must build before any change: $why"
         $baseline.Tests | Should -BeGreaterThan 0
         $baseline.FailingTests | Should -Be 0
     }
