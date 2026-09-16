@@ -49,7 +49,7 @@ jobs:
 
       - name: Pester (unit + integration)
         shell: pwsh
-        run: ./build/Invoke-Tests.ps1 -CI -IncludeBuild:${{ runner.os != 'macOS' }}
+        run: ./build/Invoke-Tests.ps1 -CI -IncludeBuild:$${{ runner.os != 'macOS' }}
 
       - name: Upload test results
         if: always()
