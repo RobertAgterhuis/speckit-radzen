@@ -20,8 +20,11 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent $PSScriptRoot
-$pester = Get-Module -ListAvailable Pester | Where-Object Version -ge ([version]'5.5.0') | Sort-Object Version -Descending | Select-Object -First 1
-if (-not $pester) { throw 'Pester 5.5+ is required: Install-Module Pester -MinimumVersion 5.5.0 -Scope CurrentUser' }
+# The suite targets Pester 5.x (verified on 5.7.1). Pester 6 is not supported yet.
+$pester = Get-Module -ListAvailable Pester |
+    Where-Object { $_.Version -ge [version]'5.5.0' -and $_.Version.Major -eq 5 } |
+    Sort-Object Version -Descending | Select-Object -First 1
+if (-not $pester) { throw 'Pester 5.x (5.5 or later) is required: Install-Module Pester -RequiredVersion 5.7.1 -Scope CurrentUser -SkipPublisherCheck' }
 Import-Module $pester -Force
 
 if ($IncludeBuild) { $env:SKR_INCLUDE_BUILD = '1' } else { $env:SKR_INCLUDE_BUILD = $null }

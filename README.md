@@ -82,7 +82,7 @@ pwsh .speckit/radzen/tools/speckit-radzen.ps1 help
 ./build/Build-Catalog.ps1       # regenerate core/antipatterns/*.md from rules.json
 ./build/Test-Drift.ps1          # generated files up to date?
 ./build/Test-Repository.ps1     # schemas, links, secrets, versions
-./build/Invoke-Tests.ps1        # Pester (add -CI for results + coverage, -IncludeBuild for the NuGet e2e test)
+./build/Invoke-Tests.ps1        # Pester 5.x, verified on 5.7.1 (add -CI for results + coverage, -IncludeBuild for the NuGet e2e test)
 ./build/Build-Package.ps1       # dist/speckit-radzen-<version>.zip + checksum
 ```
 
