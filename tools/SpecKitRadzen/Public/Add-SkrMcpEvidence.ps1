@@ -26,6 +26,8 @@ function Add-SkrMcpEvidence {
         [switch] $Force,
         [string] $Repository = (Get-Location).Path
     )
+    $Members = @($Members | Where-Object { $_ })
+    $ProjectEvidence = @($ProjectEvidence | Where-Object { $_ })
     $repo = Resolve-SkrRepository -Path $Repository
     $f = Resolve-SkrFeature -Repository $repo -Feature $Feature
     $path = Join-Path $f.Path 'mcp-evidence.json'

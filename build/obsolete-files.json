@@ -1,0 +1,22 @@
+{
+  "description": "V1 paths replaced in V2. Removed by build/Remove-ObsoleteFiles.ps1; build/Test-Repository.ps1 fails while any exist.",
+  "paths": [
+    "core/workflows/clarify.md",
+    "core/workflows/discover.md",
+    "core/workflows/implement.md",
+    "core/workflows/plan.md",
+    "core/workflows/review.md",
+    "core/workflows/specify.md",
+    "core/workflows/tasks.md",
+    "core/templates/feature-spec.md",
+    "core/templates/implementation-plan.md",
+    "core/templates/project-profile.md",
+    "core/checklists/implementation.md",
+    "core/examples/example-feature.md",
+    "integrations/claude/.claude",
+    "integrations/codex/.agents",
+    "integrations/codex/AGENTS.md",
+    "integrations/copilot/.github",
+    "integrations/generic/.agents"
+  ]
+}

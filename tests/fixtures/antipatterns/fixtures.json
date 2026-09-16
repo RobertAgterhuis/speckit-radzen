@@ -306,7 +306,8 @@
         "mcp.json": "{ \"servers\": { \"radzen-blazor\": { \"url\": \"https://app.radzen.com/mcp\", \"headers\": { \"X-Radzen-Key\": \"rk_4f8a9b0c1d2e3f4a5b6c\" } } } }\n"
       },
       "negative": {
-        "mcp.json": "{ \"servers\": { \"radzen-blazor\": { \"url\": \"https://app.radzen.com/mcp\", \"headers\": { \"X-Radzen-Key\": \"${input:radzen-key}\" } } } }\n"
+        "mcp.json": "{ \"servers\": { \"radzen-blazor\": { \"url\": \"https://app.radzen.com/mcp\", \"headers\": { \"X-Radzen-Key\": \"${input:radzen-key}\" } } } }\n",
+        "config.toml": "[mcp_servers.radzen-blazor]\nurl = \"https://app.radzen.com/mcp\"\nenv_http_headers = { \"X-Radzen-Key\" = \"RADZEN_MCP_KEY\" }\n"
       }
     },
     {

@@ -1,91 +1,93 @@
-# Spec Kit Radzen V1.1.0 — Portable Distribution
+# Spec Kit Radzen 2
 
-This package turns the V1 repository-aware Radzen specification core into a portable kit for multiple AI coding agents.
+Repository-aware, **MCP-first** spec-driven development for **Radzen Blazor** features with AI coding agents (Claude Code, GitHub Copilot, Codex, Cursor and any agent that reads Markdown).
 
-## Included
+Spec Kit Radzen gives an agent a strict way of working in *your* repository:
 
-- Canonical V1 core under `core/`
-- Claude Code skill + phase commands
-- OpenAI Codex skill + `AGENTS.md` adapter
-- GitHub Copilot skill + instruction adapter
-- Generic Agent Skills adapter
-- PowerShell and Bash installers
-- Radzen MCP integration policy
-- No embedded credentials
+- **Automatic project detection** — SDK, hosting model, render modes, Radzen version and wiring, architecture, security and test stack, each fact with evidence and confidence.
+- **MCP-first workflow** — every Radzen API the agent uses is checked with the Radzen Blazor MCP and recorded as `MCP-###` evidence; the compiler has the final word.
+- **Quality gates G0–G8** — executable pass/fail checks between phases: artifact lint, traceability, build + new warnings + tests, anti-pattern scan, dependency drift, done.
+- **68 anti-patterns** — Radzen usage, render modes, security, forms, data volume, accessibility, responsive design, architecture, testing and agent behaviour; most are detected automatically.
+- **Templates with traceability IDs** — `specs/NNN-feature/` with FR → AC → test scenario → task → slice.
+- **Generated agent adapters** — one canonical operating contract rendered for every agent.
+- **Safe lifecycle** — atomic install, update that keeps your edits, clean uninstall, V1 migration.
 
-## Install into a repository
+## Requirements
 
-### PowerShell
+- PowerShell **7.4+** (`pwsh`) on Windows, macOS or Linux
+- .NET SDK of the target repository (for gate G5)
+- Radzen Blazor MCP access (trial, Pro or Team licence) — see [docs/mcp-setup.md](docs/mcp-setup.md)
+
+## Quick start
 
 ```powershell
-Expand-Archive .\speckit-radzen-v1.1.0.zip -DestinationPath .\speckit-radzen
-.\speckit-radzen\speckit-radzen-v1.1.0\install\Install-SpecKitRadzen.ps1 `
-    -Repository G:\Path\To\YourRepo `
-    -Agent All
+# 1. Install into your repository (adapters are auto-detected; confirm or pass -Agents)
+./install/Install-SpecKitRadzen.ps1 -Repository G:\Repos\MyApp -McpClient ClaudeCode,VSCode
+
+# 2. Give the MCP its key (never in a file in the repository)
+[Environment]::SetEnvironmentVariable('RADZEN_MCP_KEY', '<your key>', 'User')
+
+# 3. In the repository
+cd G:\Repos\MyApp
+pwsh .speckit/radzen/tools/speckit-radzen.ps1 detect
+pwsh .speckit/radzen/tools/speckit-radzen.ps1 mcp-check -Probe
+pwsh .speckit/radzen/tools/speckit-radzen.ps1 baseline
 ```
 
-Use `-Agent Claude`, `Codex`, `Copilot`, `Generic`, `All`, or `Auto`.
+macOS/Linux: `./install/install.sh /path/to/repo --agents claude,copilot --mcp-client ClaudeCode --yes`.
 
-`Auto` installs adapters for agent configuration directories already present in the target repository; when none are detected it installs the generic adapter.
+Then ask your agent, for example in Claude Code: `/speckit-radzen.bootstrap Add a customer overview with paging and search`. The agent walks the phases, runs the gates and reports their results.
 
-### Bash
-
-```bash
-./speckit-radzen-v1.1.0/install/install.sh /path/to/repo all
-```
-
-## Result
-
-The canonical rules are installed once:
+## How it works
 
 ```text
-.speckit/radzen/core/
+00 bootstrap ─G0─▶ 01 discover ─G1─▶ 02 specify ─▶ 03 clarify ─G2─▶ 04 plan ─G3─▶ 05 tasks ─▶ 06 analyze ─G4─▶
+   per slice: 07 implement ─G5 (build/test)─G6 (anti-pattern scan)─▶ 08 review ─G7─▶ 09 done ─G8─▶
 ```
 
-Agent-specific files are thin adapters that point back to that canonical core. This prevents three divergent copies of the standards.
+| You get in the repository | Purpose |
+|---|---|
+| `.speckit/radzen/core/` | Constitution, workflows, gates, MCP rules, standards, patterns, templates, anti-patterns |
+| `.speckit/radzen/tools/` | PowerShell module + `speckit-radzen.ps1` CLI |
+| `.speckit/radzen/profile.md` | Detected project profile |
+| `.speckit/radzen/local/` | Your amendments (never overwritten) |
+| `specs/NNN-name/` | Spec, plan, tasks, MCP evidence, gate results per feature |
+| Agent adapters | `.claude/`, `.github/`, `.agents/`, `.cursor/`, `SPECKIT-RADZEN.md` + managed blocks in `CLAUDE.md`, `AGENTS.md`, `copilot-instructions.md` |
 
-Typical adapter locations:
+## CLI
 
 ```text
-.claude/skills/speckit-radzen/SKILL.md
-.claude/commands/speckit-radzen.discover.md
-.claude/commands/speckit-radzen.specify.md
-...
-.agents/skills/speckit-radzen/SKILL.md
-.github/skills/speckit-radzen/SKILL.md
+pwsh .speckit/radzen/tools/speckit-radzen.ps1 help
 ```
 
-## Claude phase commands
+`status`, `detect`, `verify-install`, `mcp-check`, `baseline`, `new-feature`, `state`, `phase`, `lint`, `analyze`, `evidence add|list`, `scan`, `gate G0..G8`, `install`, `update`, `uninstall`. Every command accepts `-Json`. Exit codes: 0 pass · 1 fail · 2 pass with waivers · 3 cannot evaluate.
 
-The package provides:
+## Documentation
 
-```text
-/speckit-radzen.discover
-/speckit-radzen.specify
-/speckit-radzen.clarify
-/speckit-radzen.plan
-/speckit-radzen.tasks
-/speckit-radzen.implement
-/speckit-radzen.review
+| Document | For |
+|---|---|
+| [docs/user-guide.md](docs/user-guide.md) | Installing, daily use, the phases and gates, updating |
+| [docs/mcp-setup.md](docs/mcp-setup.md) | Radzen MCP per client, keys, troubleshooting |
+| [docs/authoring-guide.md](docs/authoring-guide.md) | Extending the kit: rules, detection, patterns, adapters |
+| [docs/troubleshooting.md](docs/troubleshooting.md) | Common problems |
+| [core/README.md](core/README.md) | The canonical rule set |
+| [core/examples/specs/001-customer-search](core/examples/specs/001-customer-search/spec.md) | A complete worked feature |
+| [docs/adr/](docs/adr/README.md) | Architecture decisions |
+| [docs/plan/](docs/plan/speckit-radzen-v2-implementation-plan.md) | The V2 implementation plan |
+
+## Developing the kit
+
+```powershell
+./build/Build-Adapters.ps1      # regenerate integrations/ from core/agents/
+./build/Build-Catalog.ps1       # regenerate core/antipatterns/*.md from rules.json
+./build/Test-Drift.ps1          # generated files up to date?
+./build/Test-Repository.ps1     # schemas, links, secrets, versions
+./build/Invoke-Tests.ps1        # Pester (add -CI for results + coverage, -IncludeBuild for the NuGet e2e test)
+./build/Build-Package.ps1       # dist/speckit-radzen-<version>.zip + checksum
 ```
 
-Exact UI/invocation behavior can vary by agent/client version; the underlying skill remains the same.
+CI workflows live in `build/ci/` — copy them to `.github/workflows/` to activate.
 
-## Radzen MCP
+## Licence
 
-Configure Radzen MCP separately in each AI client using the current Radzen/client instructions. Credentials are intentionally not included in this distribution.
-
-The Spec Kit treats MCP as live Radzen technical knowledge, while repository evidence determines project architecture.
-
-## Safe installation
-
-The installer:
-- does not delete unrelated `.claude`, `.agents`, or `.github` files;
-- refuses to overwrite managed files by default;
-- requires `-Force` / `FORCE=1` for replacement;
-- does not modify application source code;
-- does not install packages;
-- does not store MCP credentials.
-
-## Version
-1.1.0
+MIT — see [LICENSE](LICENSE).

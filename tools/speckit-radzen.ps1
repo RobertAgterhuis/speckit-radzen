@@ -12,20 +12,22 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+if ($env:NO_COLOR -or [Console]::IsOutputRedirected) { $PSStyle.OutputRendering = 'PlainText' }
 Import-Module (Join-Path $PSScriptRoot 'SpecKitRadzen' 'SpecKitRadzen.psd1') -Force
 
 # ---- argument parsing: -Name value, -Switch, positional ----
 $named = @{}
 $positional = [System.Collections.Generic.List[string]]::new()
+$argList = @($Arguments | Where-Object { $null -ne $_ })
 $switchNames = @('Json', 'All', 'Strict', 'Probe', 'ListManual', 'Force', 'NoWrite', 'SkipTests', 'CompileVerified', 'FallbackApproved', 'Yes', 'WhatIf', 'SkipUserLevel', 'KeepLocal', 'EnableHooks')
-for ($i = 0; $i -lt @($Arguments).Count; $i++) {
-    $a = "$($Arguments[$i])"
+for ($i = 0; $i -lt $argList.Count; $i++) {
+    $a = "$($argList[$i])"
     if ($a -match '^--?([A-Za-z][\w-]*)(?:[:=](.*))?$') {
         $name = ($Matches[1] -replace '-(\w)', { $_.Groups[1].Value.ToUpperInvariant() })
         $name = $name.Substring(0, 1).ToUpperInvariant() + $name.Substring(1)
         if ($null -ne $Matches[2]) { $named[$name] = $Matches[2] }
         elseif ($switchNames -contains $name) { $named[$name] = $true }
-        elseif ($i + 1 -lt @($Arguments).Count) { $named[$name] = "$($Arguments[$i + 1])"; $i++ }
+        elseif ($i + 1 -lt $argList.Count) { $named[$name] = "$($argList[$i + 1])"; $i++ }
         else { $named[$name] = $true }
     }
     else { $positional.Add($a) }
@@ -208,7 +210,7 @@ Exit codes: 0 ok/pass · 1 fail · 2 pass with waivers · 3 cannot evaluate
         if (Test-Path $pp) { $prof = Get-Content $pp -Raw | ConvertFrom-Json }
         $features = @(try { Get-SkrFeatureState -All -Repository $repo } catch { @() })
         $mcp = Test-SkrMcpConfiguration -Repository $repo -SkipUserLevel
-        $o = [pscustomobject]@{ kitVersion = $ver; profileGeneratedAt = $prof.generatedAt; health = @($prof.health); mcp = $mcp.Status; features = $features }
+        $o = [pscustomobject]@{ kitVersion = $ver; profileGeneratedAt = $prof.generatedAt; health = @(if ($prof) { $prof.health }); mcp = $mcp.Status; features = $features }
         Out-Result $o {
             param($s)
             "Spec Kit Radzen $($s.kitVersion)"
@@ -221,6 +223,6 @@ Exit codes: 0 ok/pass · 1 fail · 2 pass with waivers · 3 cannot evaluate
     'install' { $r = Install-SpecKitRadzen -Repository $repo -Agents (Get-List 'Agents') -McpClient (Get-List 'McpClient') -Force:([bool](Get-Arg 'Force' $false)) -Yes:([bool](Get-Arg 'Yes' $false)) -EnableHooks:([bool](Get-Arg 'EnableHooks' $false)) -WhatIf:([bool](Get-Arg 'WhatIf' $false)); Out-Result $r { param($o) $o.Summary } }
     'update' { $r = Update-SpecKitRadzen -Repository $repo -Source (Get-Arg 'Source') -Force:([bool](Get-Arg 'Force' $false)) -WhatIf:([bool](Get-Arg 'WhatIf' $false)); Out-Result $r { param($o) $o.Summary } }
     'uninstall' { $r = Uninstall-SpecKitRadzen -Repository $repo -KeepLocal:([bool](Get-Arg 'KeepLocal' $true)) -WhatIf:([bool](Get-Arg 'WhatIf' $false)); Out-Result $r { param($o) $o.Summary } }
-    default { Write-Error "Unknown command '$Command'. Run 'help'."; $exit = 3 }
+    default { [Console]::Error.WriteLine("Unknown command '$Command'. Run 'help'."); $exit = 3 }
 }
 exit $exit

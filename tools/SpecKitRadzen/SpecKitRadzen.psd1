@@ -8,7 +8,23 @@
     Description          = 'Repository-aware, MCP-first spec-driven workflow for Radzen Blazor features: project detection, anti-pattern scanning, quality gates and a lifecycle installer.'
     PowerShellVersion    = '7.4'
     CompatiblePSEditions = @('Core')
-    FunctionsToExport    = '*'
+    FunctionsToExport    = @(
+        'Add-SkrMcpEvidence',
+        'Get-SkrFeatureState',
+        'Get-SkrProjectProfile',
+        'Install-SpecKitRadzen',
+        'Invoke-SkrAnalysis',
+        'Invoke-SkrAntiPatternScan',
+        'Invoke-SkrQualityGate',
+        'New-SkrBuildBaseline',
+        'New-SkrFeature',
+        'Set-SkrFeaturePhase',
+        'Test-SkrArtifact',
+        'Test-SkrMcpConfiguration',
+        'Test-SpecKitRadzenInstall',
+        'Uninstall-SpecKitRadzen',
+        'Update-SpecKitRadzen'
+    )
     CmdletsToExport      = @()
     VariablesToExport    = @()
     AliasesToExport      = @()

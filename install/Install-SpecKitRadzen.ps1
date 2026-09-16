@@ -1,74 +1,38 @@
-[CmdletBinding()]
+#Requires -Version 7.4
+<#
+.SYNOPSIS
+    Installs Spec Kit Radzen into a repository (bootstrap wrapper around the SpecKitRadzen module).
+.EXAMPLE
+    ./install/Install-SpecKitRadzen.ps1 -Repository G:\Repos\MyApp
+.EXAMPLE
+    ./install/Install-SpecKitRadzen.ps1 -Repository . -Agents claude,copilot -McpClient ClaudeCode,VSCode -Yes
+.EXAMPLE
+    ./install/Install-SpecKitRadzen.ps1 -Repository . -Update       # upgrade an existing (or V1) install
+.EXAMPLE
+    ./install/Install-SpecKitRadzen.ps1 -Repository . -Uninstall
+.NOTES
+    V1 parameter -Agent (Auto|Claude|Codex|Copilot|Generic|All) is still accepted.
+#>
+[CmdletBinding(SupportsShouldProcess)]
 param(
-    [Parameter(Position=0)]
-    [string]$Repository = (Get-Location).Path,
-
-    [ValidateSet("Auto","Claude","Codex","Copilot","Generic","All")]
-    [string]$Agent = "Auto",
-
-    [switch]$Force
+    [Parameter(Position = 0)][string] $Repository = (Get-Location).Path,
+    [ValidateSet('claude', 'copilot', 'codex', 'cursor', 'generic', 'all', 'auto')][string[]] $Agents = @(),
+    [ValidateSet('Auto', 'Claude', 'Codex', 'Copilot', 'Cursor', 'Generic', 'All')][string] $Agent,
+    [ValidateSet('ClaudeCode', 'VSCode', 'VisualStudio', 'Cursor', 'Codex')][string[]] $McpClient = @(),
+    [switch] $Force,
+    [switch] $Yes,
+    [switch] $EnableHooks,
+    [switch] $Update,
+    [switch] $Uninstall,
+    [switch] $Verify
 )
-
-$ErrorActionPreference = "Stop"
-$repo = (Resolve-Path $Repository).Path
+$ErrorActionPreference = 'Stop'
+if ($PSVersionTable.PSVersion -lt [version]'7.4') { throw 'Spec Kit Radzen requires PowerShell 7.4 or later (pwsh).' }
 $dist = Split-Path -Parent $PSScriptRoot
-$coreSource = Join-Path $dist "core"
-$coreTarget = Join-Path $repo ".speckit\radzen\core"
+Import-Module (Join-Path $dist 'tools' 'SpecKitRadzen' 'SpecKitRadzen.psd1') -Force
+if ($Agent -and -not $Agents.Count) { $Agents = @($Agent.ToLowerInvariant()) }
 
-function Copy-Safe([string]$Source, [string]$Destination) {
-    if ((Test-Path $Destination) -and -not $Force) {
-        throw "Destination already exists: $Destination. Use -Force to replace managed Spec Kit files."
-    }
-    if (Test-Path $Destination) { Remove-Item $Destination -Recurse -Force }
-    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $Destination) | Out-Null
-    Copy-Item $Source $Destination -Recurse -Force
-}
-
-Write-Host "Installing Spec Kit Radzen into: $repo"
-Copy-Safe $coreSource $coreTarget
-
-$detected = @()
-if ($Agent -eq "Auto") {
-    if (Test-Path (Join-Path $repo ".claude")) { $detected += "Claude" }
-    if (Test-Path (Join-Path $repo ".agents")) { $detected += "Codex" }
-    if (Test-Path (Join-Path $repo ".github")) { $detected += "Copilot" }
-    if ($detected.Count -eq 0) { $detected += "Generic" }
-} elseif ($Agent -eq "All") {
-    $detected = @("Claude","Codex","Copilot")
-} else {
-    $detected = @($Agent)
-}
-
-foreach ($a in $detected) {
-    $source = Join-Path $dist ("integrations\" + $a.ToLower())
-    if (-not (Test-Path $source)) { throw "Integration source missing: $source" }
-
-    Get-ChildItem $source -Force | ForEach-Object {
-        $dest = Join-Path $repo $_.Name
-        if ($_.PSIsContainer) {
-            # Merge adapter directories without deleting unrelated repository configuration.
-            Get-ChildItem $_.FullName -Recurse -File -Force | ForEach-Object {
-                $relative = $_.FullName.Substring($source.Length).TrimStart('\','/')
-                $targetFile = Join-Path $repo $relative
-                if ((Test-Path $targetFile) -and -not $Force) {
-                    throw "Managed integration file exists: $targetFile. Use -Force to overwrite it."
-                }
-                New-Item -ItemType Directory -Force -Path (Split-Path -Parent $targetFile) | Out-Null
-                Copy-Item $_.FullName $targetFile -Force
-            }
-        } else {
-            if ((Test-Path $dest) -and -not $Force) {
-                Write-Warning "Skipping existing root file: $dest"
-            } else {
-                Copy-Item $_.FullName $dest -Force
-            }
-        }
-    }
-    Write-Host "Installed adapter: $a"
-}
-
-Write-Host ""
-Write-Host "Spec Kit Radzen installed."
-Write-Host "Canonical core: .speckit\radzen\core"
-Write-Host "Agents: $($detected -join ', ')"
-Write-Host "Configure Radzen MCP separately in your AI client; never commit credentials."
+if ($Verify) { $r = Test-SpecKitRadzenInstall -Repository $Repository; $r | Format-List Healthy, KitVersion, Agents, Problems | Out-String; if (-not $r.Healthy) { exit 1 }; return }
+if ($Uninstall) { (Uninstall-SpecKitRadzen -Repository $Repository -Force:$Force -WhatIf:$WhatIfPreference).Summary; return }
+if ($Update) { (Update-SpecKitRadzen -Repository $Repository -Source $dist -Agents $Agents -McpClient $McpClient -Force:$Force -EnableHooks:$EnableHooks -WhatIf:$WhatIfPreference).Summary; return }
+(Install-SpecKitRadzen -Repository $Repository -Source $dist -Agents $Agents -McpClient $McpClient -Force:$Force -Yes:$Yes -EnableHooks:$EnableHooks -WhatIf:$WhatIfPreference).Summary

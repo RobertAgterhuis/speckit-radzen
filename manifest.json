@@ -1,14 +1,23 @@
 {
   "name": "speckit-radzen",
-  "version": "1.1.0",
+  "version": "2.0.0",
+  "coreVersion": "2.0.0",
+  "schemaVersion": 2,
   "distribution": "portable",
-  "coreVersion": "1.0.0",
-  "integrations": [
-    "claude",
-    "codex",
-    "copilot",
-    "generic-agent-skills"
-  ],
+  "runtime": { "powershell": ">=7.4", "dotnetSdk": "required for gate G5 in target repositories" },
+  "agents": ["claude", "copilot", "codex", "cursor", "generic"],
+  "mcpClients": ["ClaudeCode", "VSCode", "VisualStudio", "Cursor", "Codex"],
+  "mcpServers": {
+    "radzen-blazor": { "url": "https://app.radzen.com/mcp", "transport": "streamable-http", "authHeader": "X-Radzen-Key", "keyEnvironmentVariable": "RADZEN_MCP_KEY", "tools": ["search"] },
+    "radzen-blazor-studio": { "transport": "local", "optional": true }
+  },
+  "gates": ["G0", "G1", "G2", "G3", "G4", "G5", "G6", "G7", "G8"],
+  "phases": ["bootstrap", "discover", "specify", "clarify", "plan", "tasks", "analyze", "implement", "review", "done"],
+  "installLayout": {
+    "kit": ".speckit/radzen/",
+    "local": ".speckit/radzen/local/",
+    "features": "specs/NNN-name/"
+  },
   "repositoryAware": true,
   "architecturePreserving": true,
   "radzenMcpFirst": true,

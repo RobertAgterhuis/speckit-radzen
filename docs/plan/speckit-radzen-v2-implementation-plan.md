@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | Proposed, awaiting approval |
+| **Status** | Implemented (2026-09-16) — see `v2-completion-report.md` |
 | **Date** | 2026-09-15 |
 | **Baseline** | `speckit-radzen` 1.1.0 (core 1.0.0), branch `main` |
 | **Target** | `speckit-radzen` 2.0.0 |
@@ -65,7 +65,7 @@ V1's core principles (repository awareness, architecture preservation, evidence 
 | V1-13 | Medium | Copilot has no path-scoped instructions (`*.instructions.md` with `applyTo`) and no prompt files. Codex has no prompts. There is no Cursor adapter. | P7 |
 | V1-14 | Low | Version drift: manifest `coreVersion 1.0.0`, core README "V1", README refers to a zip (`speckit-radzen-v1.1.0`) that the repo does not produce. There is no `.gitignore` and the LICENSE has no holder. | P0 |
 | V1-15 | Medium | No tests, fixtures or CI. The example is a thin narrative, not a full artifact set. | P9, P10 |
-| V1-16 | Low | Not aligned with GitHub Spec Kit conventions (`specs/NNN-feature/`, `/speckit.*`, extension hooks `before_*` / `after_*`). | P1, P10 |
+| V1-16 | Low | No standard artifact folder or naming convention. V2 adopts `specs/NNN-feature/` but stays standalone (D2). | P1 |
 
 ---
 
@@ -78,7 +78,7 @@ V1's core principles (repository awareness, architecture preservation, evidence 
 3. **Artifacts are data.** Profiles, gate results and MCP evidence are stored as JSON (with a schema) and rendered to Markdown for people.
 4. **Least surprise in the target repo.** Installs are atomic, merges use markers, a hash manifest detects local edits, and uninstall is clean.
 5. **No secrets, ever.** MCP keys come from environment variables or client input prompts only, and a scanner enforces this.
-6. **Spec Kit compatible.** The layout follows GitHub Spec Kit conventions so the kit can also ship as a Spec Kit extension (P10).
+6. **Evolve, don't replace.** V2 builds on the existing V1 repository and files (D2). It stays standalone, with no dependency on the `specify` CLI. Artifact folder names follow a `specs/NNN-feature/` convention familiar to Spec Kit users, but no Spec Kit extension is shipped.
 
 ### 3.2 Repository layout (distribution repo)
 
@@ -179,7 +179,7 @@ Each phase ends with its own exit criteria. I will not start a phase until the p
 **Objective:** A clean base for V2 work.
 
 - Create branch `v2`, `.gitignore` and `.gitattributes` (`*.sh text eol=lf`, `*.ps1 text eol=crlf`), `VERSION`, and an `.editorconfig`.
-- ADRs in `docs/adr/`: ADR-001 tooling runtime (D1), ADR-002 Spec Kit alignment (D2), ADR-003 generated adapters, ADR-004 artifact layout and IDs, ADR-005 secrets handling.
+- ADRs in `docs/adr/`: ADR-001 tooling runtime = PowerShell 7 (D1), ADR-002 evolve V1 in place as a standalone kit (D2), ADR-003 generated adapters, ADR-004 artifact layout and IDs, ADR-005 secrets handling.
 - Define the `manifest.json` v2 schema and bump to `2.0.0-alpha.1`.
 - Scaffold the PowerShell module (manifest, `Public` / `Private`, PSScriptAnalyzer settings).
 - CI skeleton: Pester on `windows-latest` and `ubuntu-latest`, markdownlint, link check.
@@ -190,7 +190,7 @@ Each phase ends with its own exit criteria. I will not start a phase until the p
 **Objective:** Make the process precise, traceable and stateful.
 
 - **Constitution v2:** principle IDs `P-01…P-16`. Each principle links to the gates that enforce it. Add P-15 "MCP evidence" and P-16 "Render-mode correctness". Add a versioning and amendment section, and support local amendments in `.speckit/radzen/local/constitution.local.md`.
-- **Workflows:** rewrite each workflow with *Purpose, Inputs, Reads, Steps, Outputs, ENTRY gate, EXIT gate, Stop conditions, Anti-patterns to watch*. Add `00-bootstrap`, `analyze` (cross-artifact consistency, as in `/speckit.analyze`) and `release` / done.
+- **Workflows:** extend each existing V1 workflow file (content preserved, restructured) with *Purpose, Inputs, Reads, Steps, Outputs, ENTRY gate, EXIT gate, Stop conditions, Anti-patterns to watch*. Add `00-bootstrap`, `analyze` (cross-artifact consistency) and `release` / done.
 - **Traceability ID scheme:** `FR-###`, `AC-###`, `NFR-###`, `T-###`, `S-##` (slice), `MCP-###`, `AP-XXX-##`, `G#`, `P-##`, `Q-###` (clarification).
 - **Artifact layout** `specs/NNN-feature/` and `state.json` (phase, gates passed, timestamps), with JSON Schemas in `core/schemas/`.
 - Update `core/README.md` to V2.
@@ -272,7 +272,7 @@ Each phase ends with its own exit criteria. I will not start a phase until the p
   - **Package / project drift:** G7 (compares package references and project list against the baseline and the plan's approved changes)
 - Writes `gates/G#.json` plus an aggregated `gate-report.md`, and updates `state.json`.
 - Configurable thresholds in `.speckit/radzen/config.json` (for example `allowNewWarnings: 0`, test filter, excluded paths).
-- **Hook integration:** Claude Code hooks (optional, opt-in) that run G6 after edits to `*.razor` / `*.cs`; a Spec Kit `after_implement` / `before_…` hook mapping (P10); and a CI example workflow that runs G5, G6 and G8 on pull requests.
+- **Hook integration:** Claude Code hooks (optional, opt-in) that run G6 after edits to `*.razor` / `*.cs`; and a CI example workflow that runs G5, G6 and G8 on pull requests.
 - Checklists rewritten so each item references its gate ID.
 
 **Exit:** End-to-end test: the fixture feature goes G0→G8 green, and each gate has at least one failing test case.
@@ -379,7 +379,7 @@ Each phase ends with its own exit criteria. I will not start a phase until the p
 - `README.md` rewritten: quick start in under 5 minutes, command reference, how gates work, and a V1 → V2 migration section.
 - `docs/user-guide.md`, `docs/mcp-setup.md` (per client, including licensing: trial vs Pro/Team), `docs/authoring-guide.md` (adding AP rules, patterns, adapters), `docs/troubleshooting.md`.
 - **Worked example:** a full `specs/001-customer-search/` against `buildable-sample`, with every artifact, evidence and gate report filled in.
-- **Packaging:** `build/Build-Package.ps1` creates `speckit-radzen-2.0.0.zip` with a SHA-256 checksum. Optional: publish the module to the PowerShell Gallery and a **Spec Kit extension package** (`extension.yml`, commands `speckit.radzen.*`, hooks `after_tasks` → G4, `after_implement` → G5 / G6), depending on D2.
+- **Packaging:** `build/Build-Package.ps1` creates `speckit-radzen-2.0.0.zip` with a SHA-256 checksum. Optional: publish the module to the PowerShell Gallery.
 - CHANGELOG 2.0.0, updated `manifest.json`, tag `v2.0.0`, GitHub release workflow.
 
 **Exit:** Release artifacts built by CI. The quick start is verified on a clean fixture repo on Windows.
@@ -413,17 +413,15 @@ Tests are written **with** each phase (fixtures for P3 and P4 are created in tho
 
 ---
 
-## 6. Decisions needed from you
+## 6. Decisions (made 2026-09-15)
 
-| ID | Decision | Options | Recommendation |
-|---|---|---|---|
-| **D1** | Runtime for automation (detector, scanner, gates, installer) | **(a)** PowerShell 7 module, cross-platform, tested with Pester · (b) .NET 10 global tool (`dotnet speckit-radzen`), Roslyn-capable, xUnit, NuGet · (c) Python | **(a)** PowerShell 7. There is no build step, it runs wherever the agents run, and it fits the existing installer. Roslyn-grade analysis can be added later as a (b) plug-in if regex precision proves insufficient. |
-| **D2** | Relationship with GitHub Spec Kit | (a) Standalone only · **(b)** Standalone and Spec Kit compatible layout, plus an optional Spec Kit extension package · (c) Spec Kit extension only | **(b)**. It works without the `specify` CLI and plugs into it when present. |
-| **D3** | Agent adapters | Claude Code, Copilot, Codex, Generic (**+ Cursor?**) | Include Cursor. Radzen officially supports it and it costs little once adapters are generated. |
-| **D4** | Documentation language | **English** · Dutch · both | English (agent instructions work best in English, and V1 is English). |
-| **D5** | Radzen MCP access for validation | Do you have a Pro/Team key available locally for scenario runs (SC-01…SC-06)? | Needed at the end of P9. Otherwise I use the trial quota sparingly. |
-
----
+| ID | Decision | Outcome |
+|---|---|---|
+| **D1** | Runtime for automation (detector, scanner, gates, installer) | **PowerShell 7 module**, cross-platform, tested with Pester. Roslyn-grade analysis stays a possible later add-on. |
+| **D2** | Relationship with GitHub Spec Kit | **Use the existing code and extend it.** V2 evolves the V1 repository in place as a standalone kit. No Spec Kit extension package and no `specify` CLI dependency. |
+| **D3** | Agent adapters | Claude Code, GitHub Copilot, Codex, Generic **+ Cursor**. |
+| **D4** | Documentation language | **English** for all docs and agent instructions. |
+| **D5** | Radzen MCP access for validation | **Pro/Team key available.** It is supplied locally through an environment variable for the scenario runs in P9 and never committed. |
 
 ## 7. Risks and mitigations
 
@@ -433,7 +431,7 @@ Tests are written **with** each phase (fixtures for P3 and P4 are created in tho
 | Regex scanner false positives | Gate fatigue, agents ignore it | Precision-first rules, waivers with reasons, negative fixtures, `manual-review` downgrade. |
 | Agent client formats evolve (Copilot agents, Claude commands, Cursor rules) | Adapter breakage | Generated adapters, per-client templates isolated, verified at implementation time and in CI drift checks. |
 | Instruction bloat exceeds agent context | Agents skip rules | Progressive disclosure: small entry file, phase-scoped reads, role cards. |
-| MCP trial quota (50 requests) | Validation blocked | Evidence reuse, query budget, D5. |
+| MCP quota for users on the trial (50 requests) | Validation blocked for those users | Evidence reuse and query budget. The Pro/Team key (D5) covers the kit's own validation runs. |
 | Overwriting user files in target repos | Loss of trust | Hash manifest, managed blocks, `.speckit-new` side files, dry-run, rollback. |
 | `dotnet build` in G5 is slow on large solutions | Slow feedback | Scope builds to affected projects, cache the baseline, configurable test filter. |
 
@@ -459,4 +457,3 @@ Tests are written **with** each phase (fixtures for P3 and P4 are created in tho
 - Radzen Blazor MCP documentation (`search` tool, usage tips, licensing): https://www.radzen.com/blazor-mcp/documentation
 - Radzen Blazor Studio MCP (local designer server): https://www.radzen.com/blog/ai-agent-blazor-designer-mcp-server
 - GitHub Spec Kit reference (commands, layout, extensions, presets): https://github.github.com/spec-kit/reference/overview.html
-- GitHub Spec Kit extensions and hooks: https://github.github.com/spec-kit/reference/extensions.html

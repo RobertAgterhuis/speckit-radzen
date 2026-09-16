@@ -82,7 +82,8 @@ function Get-SkrContentHash {
     $bytes = [System.IO.File]::ReadAllBytes($Path)
     $isText = -not ($bytes -contains 0)
     if ($isText) {
-        $text = [System.Text.Encoding]::UTF8.GetString($bytes) -replace "`r`n", "`n"
+        $text = [System.Text.Encoding]::UTF8.GetString($bytes).TrimStart([char]0xFEFF) -replace "`r`n", "`n"
+        $text = $text.TrimEnd("`n") + "`n"
         $bytes = [System.Text.Encoding]::UTF8.GetBytes($text)
     }
     $sha = [System.Security.Cryptography.SHA256]::Create()
