@@ -30,7 +30,7 @@
 | ≥ 45 anti-patterns; automated rules with positive/negative fixtures | ✅ | 68 rules; all 37 automated regex/absence rules plus 2 tool rules have fixtures |
 | Detector verified on 10 fixture repositories | ✅ | `Detection.Tests.ps1` (34 tests) |
 | Adapters for 5 targets, zero drift | ✅ | `Test-Drift.ps1` |
-| Installer lifecycle tested | ✅ on Linux | Windows/macOS through the CI matrix |
+| Installer lifecycle tested | ✅ | CI matrix: Windows, Linux, macOS |
 | 20 scenarios documented; ≥ 6 executed | ⚠️ Documented only | Runs need your Radzen key and an agent session (see below) |
 | Docs, worked example, package | ✅ | `dist/` built locally (240 files, SHA-256 in `RELEASE_NOTES.md`); publishing happens on tag |
 
@@ -42,17 +42,31 @@
 - Install from the packaged zip into a fixture repo, then `detect`: OK
 - Not run locally: PSScriptAnalyzer and the NuGet end-to-end test (no package feed access in the build environment). CI runs both.
 
+## CI run (2026-09-16, commit cc4282a)
+
+GitHub Actions is green on Windows, Linux and macOS, including PSScriptAnalyzer, markdownlint and the NuGet end-to-end test on Windows and Linux. The first CI runs found and fixed:
+
+- `Invoke-ScriptAnalyzer -Path` accepts one path; the workflow now loops over `tools`, `build` and `install`.
+- markdownlint errors in the implementation plan.
+- PowerShell Gallery now serves Pester 6.2.0; CI pins Pester 5.7.1 and PSScriptAnalyzer 1.24.0, and `Invoke-Tests.ps1` requires Pester 5.x.
+- `-IncludeBuild:${{ … }}` passed a string; it is now `$${{ … }}`.
+- The buildable sample lacked `@using static Microsoft.AspNetCore.Components.Web.RenderMode` (CS0103).
+- Two installer tests compared `Set-Content` output with LF strings, which fails on Windows; they now compare bytes.
+- Actions moved to Node 24 versions (`checkout@v5`, `setup-dotnet@v5`, `upload-artifact@v6`, `setup-node@v5`).
+
 ## Known limitations and follow-ups
 
 1. **Client formats.** Adapter formats (Copilot prompt/agent frontmatter, Cursor rules/commands, Codex skill path) follow the documented formats as known on 2026-09-15. Re-verify when a client changes, then update `build/Build-Adapters.ps1`.
 2. **Radzen member names** in standards, patterns and the worked example are version-dependent (for example `FirstPage(bool)` on `RadzenDataGrid`). The worked example is compile-checked by the NuGet end-to-end test; the kit tells agents to verify every member through MCP.
 3. **Scanner precision** is regex-based (ADR-0006). Report false positives; move rules to `manual-review` when precision cannot be kept.
 4. **Radzen Blazor Studio MCP** tool names are read from the client at runtime; no Studio-specific automation exists.
+5. **Pester 6.** The suite is pinned to Pester 5.x. Migrating to Pester 6 is a separate task.
+6. **Floating package versions** in the buildable sample (`Radzen.Blazor 7.*`, `xunit 2.*`, `bunit 1.*`) can break CI when a new release lands. Pin them if that happens.
 
 ## Actions for you
 
-1. **Remove V1 leftovers** (the remote bridge cannot delete files): `pwsh ./build/Remove-ObsoleteFiles.ps1`
-2. **Activate CI:** copy `build/ci/ci.yml` and `build/ci/release.yml` to `.github/workflows/`.
-3. **Commit** on a `v2` branch and push. Let CI run the full matrix, including `-IncludeBuild`.
+1. ~~Remove V1 leftovers~~ — done.
+2. ~~Activate CI~~ — done. Keep `.github/workflows/` in sync with `build/ci/` (`Test-Repository.ps1` warns when they differ).
+3. ~~Commit and let CI run the full matrix~~ — green at cc4282a.
 4. **Run the agent scenarios** SC-01 … SC-06 with your Pro/Team key (`tests/scenarios/README.md`) and commit the results.
-5. **Tag `v2.0.0`** when CI is green; the release workflow publishes the package.
+5. **Tag `v2.0.0`** once the scenario results are in; the release workflow publishes the package.
