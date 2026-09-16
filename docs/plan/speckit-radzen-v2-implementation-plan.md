@@ -176,6 +176,7 @@ Exit codes: `0` pass, `1` fail, `2` pass with waivers, `3` cannot evaluate (a mi
 Each phase ends with its own exit criteria. I will not start a phase until the previous one meets them.
 
 ### Phase 0 — Foundation and decisions
+
 **Objective:** A clean base for V2 work.
 
 - Create branch `v2`, `.gitignore` and `.gitattributes` (`*.sh text eol=lf`, `*.ps1 text eol=crlf`), `VERSION`, and an `.editorconfig`.
@@ -187,6 +188,7 @@ Each phase ends with its own exit criteria. I will not start a phase until the p
 **Exit:** CI green on an empty test suite. ADRs accepted.
 
 ### Phase 1 — Canonical core v2 (constitution, workflows, artifact model)
+
 **Objective:** Make the process precise, traceable and stateful.
 
 - **Constitution v2:** principle IDs `P-01…P-16`. Each principle links to the gates that enforce it. Add P-15 "MCP evidence" and P-16 "Render-mode correctness". Add a versioning and amendment section, and support local amendments in `.speckit/radzen/local/constitution.local.md`.
@@ -198,6 +200,7 @@ Each phase ends with its own exit criteria. I will not start a phase until the p
 **Exit:** Every workflow defines entry and exit gates. Schemas validate the example artifacts.
 
 ### Phase 2 — MCP-first workflow (R1)
+
 **Objective:** Radzen knowledge comes from MCP and can be audited.
 
 - **`core/mcp/tool-map.md`:**
@@ -222,6 +225,7 @@ Each phase ends with its own exit criteria. I will not start a phase until the p
 **Exit:** The worked example contains a complete evidence log. G4 fails when evidence is missing (covered by tests).
 
 ### Phase 3 — Automatic project detection (R3)
+
 **Objective:** A deterministic, machine-readable project profile.
 
 - **`core/detection/detection-rules.json`:** declarative signal → fact rules, for example:
@@ -243,6 +247,7 @@ Each phase ends with its own exit criteria. I will not start a phase until the p
 **Exit:** Detector passes against at least 8 fixture repos (see P9) with expected `profile.json` snapshots.
 
 ### Phase 4 — Anti-pattern catalog and scanner (R2)
+
 **Objective:** Known failure modes can be named, found and fixed.
 
 - **Catalog** `core/antipatterns/`. Each entry has: `ID`, title, severity (`blocker` / `major` / `minor`), category, *Why it hurts*, *Detection* (regex / structural signal or `manual-review`), *Bad example*, *Good example*, *Fix*, *MCP query to verify*, *Related principle / gate*.
@@ -262,6 +267,7 @@ Each phase ends with its own exit criteria. I will not start a phase until the p
 **Exit:** Every automated rule has at least one positive and one negative fixture. False-positive rate on the "clean" fixture repo is 0.
 
 ### Phase 5 — Quality gates (R4)
+
 **Objective:** Gates are executable and phase transitions depend on them.
 
 - Gate definitions in `core/gates/gates.json` (ID, phase, checks, severity, automation level) plus human docs.
@@ -278,6 +284,7 @@ Each phase ends with its own exit criteria. I will not start a phase until the p
 **Exit:** End-to-end test: the fixture feature goes G0→G8 green, and each gate has at least one failing test case.
 
 ### Phase 6 — Templates, standards and patterns (R5)
+
 **Objective:** Complete, consistent, Radzen-specific artifacts.
 
 - **Templates**, each with an ID scheme, required sections and example rows:
@@ -298,6 +305,7 @@ Each phase ends with its own exit criteria. I will not start a phase until the p
 **Exit:** Templates pass the G2 / G3 lint in "template mode" (required structure present). Every pattern links to at least one AP and one MCP recipe.
 
 ### Phase 7 — Agent instructions and adapters (R6)
+
 **Objective:** Every agent gets the same contract and the files never drift.
 
 - **`core/agents/operating-contract.md`:** the canonical instructions. It covers the mandatory sequence, gate discipline, MCP loop, stop conditions, reporting format ("Gate G5: PASS — evidence …"), what never to do (AP-AGT), and context-budget rules (which files to read per phase).
@@ -314,6 +322,7 @@ Each phase ends with its own exit criteria. I will not start a phase until the p
 **Exit:** Adapters are generated, the drift check is green, and every adapter is under its client's size limits.
 
 ### Phase 8 — Installer v2 (lifecycle)
+
 **Objective:** Safe, repeatable install / upgrade / uninstall.
 
 - Commands:
@@ -329,6 +338,7 @@ Each phase ends with its own exit criteria. I will not start a phase until the p
 **Exit:** Integration tests cover fresh install, re-install, upgrade with local edits, uninstall, V1→V2 migration and a failure mid-install (rollback) on Windows and Linux.
 
 ### Phase 9 — Test scenarios and test suite (R7)
+
 **Objective:** Evidence that the kit works and keeps working.
 
 - **Fixture repositories** (`tests/fixtures/repos/`), minimal files only (no full apps needed for static detection), plus **one buildable** fixture for G5 end-to-end:
@@ -374,6 +384,7 @@ Each phase ends with its own exit criteria. I will not start a phase until the p
 **Exit:** CI green. Coverage ≥ 80 % on the module. All scenarios documented. At least SC-01–SC-06 executed once against Claude Code with results recorded.
 
 ### Phase 10 — Documentation, worked example, packaging and release
+
 **Objective:** A shippable 2.0.0.
 
 - `README.md` rewritten: quick start in under 5 minutes, command reference, how gates work, and a V1 → V2 migration section.
@@ -453,7 +464,7 @@ Tests are written **with** each phase (fixtures for P3 and P4 are created in tho
 
 ## 9. Sources consulted
 
-- Radzen Blazor MCP setup (endpoint, `X-Radzen-Key`, per-client configs): https://www.radzen.com/blazor-mcp/documentation/setup
-- Radzen Blazor MCP documentation (`search` tool, usage tips, licensing): https://www.radzen.com/blazor-mcp/documentation
-- Radzen Blazor Studio MCP (local designer server): https://www.radzen.com/blog/ai-agent-blazor-designer-mcp-server
-- GitHub Spec Kit reference (commands, layout, extensions, presets): https://github.github.com/spec-kit/reference/overview.html
+- Radzen Blazor MCP setup (endpoint, `X-Radzen-Key`, per-client configs): <https://www.radzen.com/blazor-mcp/documentation/setup>
+- Radzen Blazor MCP documentation (`search` tool, usage tips, licensing): <https://www.radzen.com/blazor-mcp/documentation>
+- Radzen Blazor Studio MCP (local designer server): <https://www.radzen.com/blog/ai-agent-blazor-designer-mcp-server>
+- GitHub Spec Kit reference (commands, layout, extensions, presets): <https://github.github.com/spec-kit/reference/overview.html>
