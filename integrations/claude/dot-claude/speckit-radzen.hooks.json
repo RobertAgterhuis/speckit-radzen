@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -File .speckit/radzen/tools/speckit-radzen.ps1 scan",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}

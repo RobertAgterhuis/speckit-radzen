@@ -4,6 +4,9 @@
     Generates integrations/<agent>/ from core/agents/. See ADR-0003.
 .PARAMETER OutputRoot
     Folder to render into (default: integrations/). Test-Drift.ps1 renders into a temp folder and compares.
+    Dot-folders are stored as dot-<name> (dot-claude, dot-github, dot-agents, dot-cursor); the installer maps
+    them to .<name> in the target repository. This keeps the distribution repository from loading its own
+    adapters and lets tooling that protects dot-folders handle the files.
 #>
 [CmdletBinding()]
 param([string] $OutputRoot)
@@ -89,10 +92,10 @@ $argumentLine
 }
 
 # ---------------- Claude Code ----------------
-Save 'claude/.claude/skills/speckit-radzen/SKILL.md' $skill
+Save 'claude/dot-claude/skills/speckit-radzen/SKILL.md' $skill
 foreach ($p in @($phases.phases) + @($phases.utilities)) {
     $text = New-PhaseText $p "User context: `$ARGUMENTS"
-    Save "claude/.claude/commands/speckit-radzen.$($p.id).md" @"
+    Save "claude/dot-claude/commands/speckit-radzen.$($p.id).md" @"
 ---
 description: Spec Kit Radzen — $($p.title): $($p.summary)
 argument-hint: [feature number or request]
@@ -108,7 +111,7 @@ foreach ($role in 'discoverer', 'reviewer') {
     $desc = if ($role -eq 'reviewer') { 'Independent Spec Kit Radzen reviewer. Use after all slices pass G5/G6 to review a Radzen feature against its spec, checklists and manual-review anti-patterns, and to run gate G7.' }
     else { 'Spec Kit Radzen discoverer. Use to trace how a requested Radzen feature fits the repository (read-only) and to write discovery.md for gate G1.' }
     $tools = if ($role -eq 'reviewer') { 'Read, Grep, Glob, Bash, Edit, Write' } else { 'Read, Grep, Glob, Bash, Write' }
-    Save "claude/.claude/agents/speckit-radzen-$role.md" @"
+    Save "claude/dot-claude/agents/speckit-radzen-$role.md" @"
 ---
 name: speckit-radzen-$role
 description: $desc
@@ -124,7 +127,7 @@ $card
 Follow ``$kit/core/agents/operating-contract.md``. Report findings with IDs and evidence.
 "@
 }
-Save 'claude/.claude/speckit-radzen.hooks.json' ([ordered]@{
+Save 'claude/dot-claude/speckit-radzen.hooks.json' ([ordered]@{
         hooks = [ordered]@{
             PostToolUse = @([ordered]@{
                     matcher = 'Edit|Write|MultiEdit'
@@ -135,9 +138,9 @@ Save 'claude/.claude/speckit-radzen.hooks.json' ([ordered]@{
 Save 'claude/CLAUDE.md.block' $blockBody
 
 # ---------------- GitHub Copilot ----------------
-Save 'copilot/.github/skills/speckit-radzen/SKILL.md' $skill
-Save 'copilot/.github/copilot-instructions.md.block' $blockBody
-Save 'copilot/.github/instructions/speckit-radzen-razor.instructions.md' @"
+Save 'copilot/dot-github/skills/speckit-radzen/SKILL.md' $skill
+Save 'copilot/dot-github/copilot-instructions.md.block' $blockBody
+Save 'copilot/dot-github/instructions/speckit-radzen-razor.instructions.md' @"
 ---
 applyTo: "**/*.razor,**/*.razor.cs,**/*.razor.css"
 description: Spec Kit Radzen rules for Razor files
@@ -149,7 +152,7 @@ $generatedNote
 
 $razorRules
 "@
-Save 'copilot/.github/instructions/speckit-radzen-artifacts.instructions.md' @"
+Save 'copilot/dot-github/instructions/speckit-radzen-artifacts.instructions.md' @"
 ---
 applyTo: "specs/**"
 description: Spec Kit Radzen rules for feature artifacts
@@ -163,7 +166,7 @@ $artifactRules
 "@
 foreach ($p in @($phases.phases) + @($phases.utilities)) {
     $text = New-PhaseText $p 'User context: ${input:request:Feature number or request}'
-    Save "copilot/.github/prompts/speckit-radzen.$($p.id).prompt.md" @"
+    Save "copilot/dot-github/prompts/speckit-radzen.$($p.id).prompt.md" @"
 ---
 description: Spec Kit Radzen — $($p.title)
 agent: agent
@@ -175,7 +178,7 @@ $text
 "@
 }
 $reviewerCard = Strip-Title (Get-Content (Join-Path $agents 'roles' 'reviewer.md') -Raw)
-Save 'copilot/.github/agents/speckit-radzen-reviewer.agent.md' @"
+Save 'copilot/dot-github/agents/speckit-radzen-reviewer.agent.md' @"
 ---
 description: Independent Spec Kit Radzen reviewer for Radzen Blazor features (gate G7).
 ---
@@ -189,10 +192,10 @@ $reviewerCard
 
 # ---------------- Codex ----------------
 Save 'codex/AGENTS.md.block' $blockBody
-Save 'codex/.agents/skills/speckit-radzen/SKILL.md' $skill
+Save 'codex/dot-agents/skills/speckit-radzen/SKILL.md' $skill
 
 # ---------------- Cursor ----------------
-Save 'cursor/.cursor/rules/speckit-radzen.mdc' @"
+Save 'cursor/dot-cursor/rules/speckit-radzen.mdc' @"
 ---
 description: Spec Kit Radzen operating contract for Radzen Blazor feature work
 alwaysApply: true
@@ -202,7 +205,7 @@ $generatedNote
 
 $contractBody
 "@
-Save 'cursor/.cursor/rules/speckit-radzen-razor.mdc' @"
+Save 'cursor/dot-cursor/rules/speckit-radzen-razor.mdc' @"
 ---
 description: Spec Kit Radzen rules for Razor files
 globs: **/*.razor,**/*.razor.cs,**/*.razor.css
@@ -213,7 +216,7 @@ $generatedNote
 
 $razorRules
 "@
-Save 'cursor/.cursor/rules/speckit-radzen-artifacts.mdc' @"
+Save 'cursor/dot-cursor/rules/speckit-radzen-artifacts.mdc' @"
 ---
 description: Spec Kit Radzen rules for feature artifacts
 globs: specs/**
@@ -225,7 +228,7 @@ $generatedNote
 $artifactRules
 "@
 foreach ($p in @($phases.phases) + @($phases.utilities)) {
-    Save "cursor/.cursor/commands/speckit-radzen-$($p.id).md" @"
+    Save "cursor/dot-cursor/commands/speckit-radzen-$($p.id).md" @"
 $generatedNote
 
 $(New-PhaseText $p 'Use the text the user typed after the command as context.')
@@ -238,7 +241,7 @@ $generatedNote
 
 $contract
 "@
-Save 'generic/.agents/skills/speckit-radzen/SKILL.md' $skill
+Save 'generic/dot-agents/skills/speckit-radzen/SKILL.md' $skill
 
 $count = @(Get-ChildItem -Path $out -Recurse -File -Force).Count
 Write-Host "Adapters generated: $count files -> $out"

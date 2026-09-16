@@ -17,3 +17,7 @@ V1 shipped four byte-identical `SKILL.md` files maintained by hand, and Codex an
 ## Consequences
 
 Editing files under `integrations/` directly is pointless; the authoring guide says so and a header comment in each generated file repeats it.
+
+## Addendum (2026-09-16): dot-folder names in the distribution
+
+Adapter folders are stored as `dot-claude`, `dot-github`, `dot-agents` and `dot-cursor` inside `integrations/<agent>/`. The installer maps `dot-<name>` to `.<name>` in the target repository. Reasons: the distribution repository must not load its own adapters when an agent works on the kit itself, and some tooling (including remote file bridges) refuses to write into dot-folders.
